@@ -1,0 +1,20 @@
+<view
+  class="article-card pressable {{glowClass}}"
+  bindtap="select"
+  hover-class="article-card--active"
+  hover-start-time="20"
+  hover-stay-time="160"
+>
+  <view class="article-card__glow article-card__glow--primary" aria-hidden="true"></view>
+  <view class="article-card__glow article-card__glow--secondary" aria-hidden="true"></view>
+  <view class="article-card__content">
+    <view class="article-card__meta">
+      <text class="article-card__dot">●</text>
+      <text>{{item.publishedText}}</text>
+      <text class="article-card__read">· {{item.readTimeMinutes || 1}} 分钟</text>
+    </view>
+    <text class="article-card__title">{{item.title}}</text>
+    <text class="article-card__summary">{{item.summary}}</text>
+    <tag-list tags="{{item.tagList}}"></tag-list>
+  </view>
+</view>

@@ -1,0 +1,5 @@
+<view class="error-state">
+  <text class="error-state__title">{{title}}</text>
+  <text class="error-state__detail">{{detail}}</text>
+  <button class="error-state__button pressable" bindtap="retry">{{action}}</button>
+</view>

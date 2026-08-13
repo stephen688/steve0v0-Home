@@ -1,0 +1,90 @@
+.moment-card {
+  padding: 28rpx 28rpx 30rpx;
+  border: 2rpx solid rgba(234, 223, 212, .88);
+  border-radius: 26rpx;
+  background: #fff;
+  box-shadow: 0 12rpx 32rpx rgba(91, 67, 48, .065);
+}
+
+.moment-card__meta {
+  display: flex;
+  align-items: center;
+  color: #826f62;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.moment-card__dot {
+  margin-right: 10rpx;
+  color: #e07937;
+  font-size: 16rpx;
+  text-shadow: 0 0 10rpx rgba(224, 121, 55, .35);
+}
+
+.moment-card__tag {
+  margin-left: auto;
+}
+
+.pill {
+  display: inline-flex;
+  min-height: 40rpx;
+  align-items: center;
+  padding: 0 17rpx;
+  border: 2rpx solid #f0c7a7;
+  border-radius: 22rpx;
+  background: #fff8f1;
+  color: #c15d20;
+  font-size: 21rpx;
+  font-weight: 700;
+}
+
+.moment-card__content {
+  display: block;
+  margin-top: 18rpx;
+  color: #332c27;
+  font-size: 28rpx;
+  line-height: 1.82;
+  white-space: pre-wrap;
+}
+
+.moment-card__images {
+  display: grid;
+  gap: 8rpx;
+  margin-top: 20rpx;
+  overflow: hidden;
+  border-radius: 16rpx;
+}
+
+.moment-card__images--single {
+  grid-template-columns: 1fr;
+}
+
+.moment-card__images--double,
+.moment-card__images--grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.moment-card__images--double .moment-card__image:first-child {
+  grid-column: span 2;
+}
+
+.moment-card__image {
+  width: 100%;
+  height: 196rpx;
+  border-radius: 12rpx;
+  background: #f4eee8;
+}
+
+.moment-card__images--single .moment-card__image {
+  height: 360rpx;
+}
+
+.moment-card__media {
+  margin-top: 16rpx;
+  padding: 14rpx 18rpx;
+  border-radius: 14rpx;
+  background: #fff7ed;
+  color: #9e5d25;
+  font-size: 23rpx;
+  word-break: break-all;
+}

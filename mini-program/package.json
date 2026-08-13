@@ -1,0 +1,11 @@
+{
+  "name": "steve-home-mini-program",
+  "private": true,
+  "version": "0.1.0",
+  "description": "steve0v0 小屋原生微信小程序用户端",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "node ..\\web-admin\\node_modules\\typescript\\bin\\tsc -p tsconfig.json --noEmit",
+    "check": "npm run typecheck && npm run build"
+  }
+}

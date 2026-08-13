@@ -1,0 +1,29 @@
+# IDE and local assistant state
+/.idea/
+/.trae/
+/.workbuddy/
+*.iml
+
+# Local and private configuration
+.env
+.env.*
+!.env.example
+**/project.private.config.json
+
+# Dependencies and generated output
+**/node_modules/
+**/dist/
+**/target/
+**/build/
+*.log
+
+# Runtime data
+/steve-home/upload/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Local reference screenshots
+/Snipaste_*.png
+/、.png

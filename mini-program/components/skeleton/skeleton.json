@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "properties": {
+    "rows": { "type": "Number", "value": 3 }
+  }
+}

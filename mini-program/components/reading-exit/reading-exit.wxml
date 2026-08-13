@@ -1,0 +1,6 @@
+<button class="reading-exit" aria-label="{{label}}" bindtap="exit">
+  <view class="reading-exit__icon" aria-hidden="true">
+    <view class="reading-exit__arrow"></view>
+  </view>
+  <text class="reading-exit__label">{{label}}</text>
+</button>

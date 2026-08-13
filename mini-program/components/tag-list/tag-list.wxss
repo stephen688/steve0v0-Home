@@ -1,0 +1,40 @@
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42rpx;
+  padding: 0 18rpx;
+  border: 2rpx solid #ebdac9;
+  border-radius: 24rpx;
+  background: #fff7ed;
+  color: #a05b1b;
+  font-size: 22rpx;
+  line-height: 1.2;
+}
+
+.pill--blue {
+  border-color: #cbd5ff;
+  background: #f3f5ff;
+  color: #6d7de5;
+}
+
+.pill--gray {
+  border-color: #e6e0da;
+  background: #f5f3f1;
+  color: #776b61;
+}
+
+.pill--footer {
+  min-height: 50rpx;
+  padding: 0 22rpx;
+  border-color: #e8d5c2;
+  background: #fff6ec;
+  color: #9c531d;
+  font-size: 24rpx;
+  font-weight: 700;
+}

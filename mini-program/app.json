@@ -1,0 +1,51 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/blog/blog",
+    "pages/moments/moments",
+    "pages/about/about",
+    "pages/blog-detail/blog-detail"
+  ],
+  "window": {
+    "navigationStyle": "custom",
+    "backgroundColor": "#FFF9F2",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": true,
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#9A958F",
+    "selectedColor": "#F45B12",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "custom": false,
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "assets/tab/home.png",
+        "selectedIconPath": "assets/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/blog/blog",
+        "text": "博客",
+        "iconPath": "assets/tab/blog.png",
+        "selectedIconPath": "assets/tab/blog-active.png"
+      },
+      {
+        "pagePath": "pages/moments/moments",
+        "text": "动态",
+        "iconPath": "assets/tab/moments.png",
+        "selectedIconPath": "assets/tab/moments-active.png"
+      },
+      {
+        "pagePath": "pages/about/about",
+        "text": "关于",
+        "iconPath": "assets/tab/about.png",
+        "selectedIconPath": "assets/tab/about-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,31 @@
+.error-state {
+  padding: 50rpx 24rpx;
+  color: #947f70;
+  text-align: center;
+}
+
+.error-state__title,
+.error-state__detail {
+  display: block;
+}
+
+.error-state__title {
+  color: #594a40;
+  font-size: 27rpx;
+  font-weight: 700;
+}
+
+.error-state__detail {
+  margin-top: 6rpx;
+  font-size: 23rpx;
+}
+
+.error-state__button {
+  display: inline-block;
+  margin-top: 18rpx;
+  padding: 8rpx 26rpx;
+  border: 2rpx solid #efc6a5;
+  border-radius: 28rpx;
+  color: #d85c12;
+  font-size: 24rpx;
+}

@@ -1,0 +1,10 @@
+<view class="project-card" hover-class="project-card--active" hover-start-time="20" hover-stay-time="180">
+  <view class="project-card__aurora" aria-hidden="true"></view>
+  <view class="project-card__sheen" aria-hidden="true"></view>
+  <view class="project-card__content">
+    <view class="project-card__top">
+      <text class="project-card__name">{{item.name}}</text>
+    </view>
+    <text class="project-card__description">{{item.description || '项目简介待补充'}}</text>
+  </view>
+</view>

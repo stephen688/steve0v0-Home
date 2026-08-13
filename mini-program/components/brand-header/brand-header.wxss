@@ -1,0 +1,19 @@
+.brand-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: calc(96rpx + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
+  box-sizing: border-box;
+}
+
+.brand-mark {
+  color: #24211f;
+  font-size: 30rpx;
+  font-weight: 800;
+  letter-spacing: 3rpx;
+}
+
+.brand-mark__accent {
+  color: #f45b12;
+}

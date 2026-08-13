@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: Asia/Shanghai
+  security:
+    user:
+      name: admin
+      password: ${SPRING_SECURITY_PASSWORD:change-me}
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      # 不配置逻辑删除，使用物理删除
+      id-type: auto
+
+steve:
+  jwt:
+    secret: ${JWT_SECRET:change-me-in-development-use-32-bytes-minimum}
+    expire: 604800
+  upload:
+    path: ./upload
+  rate-limit:
+    max-attempts: 5
+    window-minutes: 5

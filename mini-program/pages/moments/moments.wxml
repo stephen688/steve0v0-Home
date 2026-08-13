@@ -1,0 +1,41 @@
+<view class="page-shell moments-page">
+  <brand-header></brand-header>
+  <view class="moments-hero">
+    <view class="moments-hero__placeholder">
+      <image wx:if="{{heroImage}}" class="moments-hero__image" src="{{heroImage}}" mode="aspectFill"></image>
+      <view class="moments-hero__veil"></view>
+      <text class="moments-hero__eyebrow">MOMENTS</text>
+      <text class="moments-hero__title">生活动态</text>
+      <text class="moments-hero__subtitle">生活与日常碎片</text>
+      <view class="moments-hero__stats">
+        <text class="moments-hero__stats-dot"></text>
+        <text>{{total}} 条生活记录</text>
+      </view>
+    </view>
+  </view>
+  <view class="moments-filter section-gap">
+    <view class="moments-filter__scope" aria-label="当前栏目：生活动态">
+      <view class="moments-filter__scope-active">
+        <text class="moments-filter__scope-dot"></text>
+        <text>生活动态</text>
+      </view>
+    </view>
+    <picker class="moments-sort" mode="selector" range="{{sortOptions}}" value="{{sortIndex}}" disabled="{{loading || loadingMore}}" bindchange="changeSort">
+      <view class="moments-sort__trigger pressable" role="button" aria-label="动态排序，当前{{sortLabel}}">
+        <text class="moments-sort__arrow">{{sortArrow}}</text>
+        <text>{{sortLabel}}</text>
+      </view>
+    </picker>
+  </view>
+  <view class="moments-list section-gap">
+    <skeleton wx:if="{{loading}}" rows="5"></skeleton>
+    <error-state wx:elif="{{error}}" title="动态暂时无法加载" detail="{{errorMessage}}" bind:retry="retry"></error-state>
+    <view wx:else>
+      <moment-card wx:for="{{moments}}" wx:key="id" item="{{item}}" bind:preview="previewImages"></moment-card>
+      <empty-state wx:if="{{!moments.length}}" title="还没有生活动态" detail="新的记录会在这里留下痕迹"></empty-state>
+      <view wx:if="{{moments.length && !hasMore}}" class="moments-end">已经到底了</view>
+      <view wx:if="{{loadingMore}}" class="moments-end">正在加载更多…</view>
+    </view>
+  </view>
+  <view class="safe-bottom"></view>
+</view>

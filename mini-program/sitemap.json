@@ -1,0 +1,9 @@
+{
+  "desc": "steve0v0 小屋用户端页面索引",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

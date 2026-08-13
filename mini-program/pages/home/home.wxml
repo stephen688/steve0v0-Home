@@ -1,0 +1,234 @@
+<view class="page-shell home-page">
+  <brand-header></brand-header>
+
+  <view class="home-greeting">
+    <view>
+      <text class="eyebrow">STEVE0V0 / HOME</text>
+      <text class="home-greeting__title">今天，也向前一点。</text>
+    </view>
+    <view class="home-greeting__tools">
+      <text class="home-greeting__date">{{selectedDate}}</text>
+      <button class="tomato-launcher {{pomodoro.running ? 'tomato-launcher--running' : ''}} {{pomodoro.completed ? 'tomato-launcher--completed' : ''}} pressable" bindtap="openPomodoro" aria-label="打开番茄钟">
+        <view class="tomato-launcher__plate">
+          <view class="tomato-mini" aria-hidden="true">
+            <view class="tomato-mini__stem"></view>
+            <view class="tomato-mini__leaf tomato-mini__leaf--left"></view>
+            <view class="tomato-mini__leaf tomato-mini__leaf--right"></view>
+            <view class="tomato-mini__body"><view class="tomato-mini__shine"></view></view>
+          </view>
+          <view class="tomato-launcher__state"></view>
+        </view>
+        <text class="tomato-launcher__label">番茄钟</text>
+      </button>
+    </view>
+  </view>
+
+  <view class="paper-card section-gap home-status-card {{status && status.state === 'studying' ? 'home-status-card--studying' : ''}}">
+    <view class="paper-card__body home-status">
+      <view class="home-status__line">
+        <view class="home-status__identity">
+          <text class="home-status__dot"></text>
+          <text class="section-title">当前状态</text>
+        </view>
+        <text wx:if="{{status}}" class="pill pill--green">{{status.stateLabel}}</text>
+      </view>
+      <skeleton wx:if="{{statusLoading}}" rows="1"></skeleton>
+      <error-state wx:elif="{{statusError}}" bind:retry="retryStatus"></error-state>
+      <view wx:else class="home-status__layout">
+        <view class="home-status__content">
+          <text wx:if="{{status && status.state === 'studying'}}" class="home-status__kicker">FOCUS SESSION</text>
+          <text class="home-status__task">{{status.currentTask || '今天还没有记录正在做的事'}}</text>
+          <text class="home-status__mood">{{status.mood || '给自己留一点空间，慢慢来。'}}</text>
+        </view>
+        <view wx:if="{{status && status.state === 'studying'}}" class="home-status__visual" aria-hidden="true">
+          <view class="home-status__halo"></view>
+          <image class="home-status__student" src="/assets/status/studying-student.webp" mode="aspectFit"></image>
+          <view class="home-status__ink-stroke"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="paper-card section-gap calendar-card">
+    <view class="paper-card__body">
+      <view class="calendar-card__head">
+        <view>
+          <text class="eyebrow">MY CALENDAR</text>
+          <text class="section-title">学习日历</text>
+          <text class="calendar-card__caption">{{calendarView === 'month' ? '看见整月的学习节奏' : '聚焦这一周的安排'}}</text>
+        </view>
+        <view class="calendar-card__switch segmented segmented--small">
+          <text class="segmented__item {{calendarView === 'month' ? 'segmented__item--active' : ''}}" data-view="month" bindtap="switchCalendarView">月</text>
+          <text class="segmented__item {{calendarView === 'week' ? 'segmented__item--active' : ''}}" data-view="week" bindtap="switchCalendarView">周</text>
+        </view>
+      </view>
+      <view class="calendar-card__nav">
+        <button class="calendar-card__arrow pressable" data-direction="-1" bindtap="shiftCalendar">‹</button>
+        <text class="calendar-card__title">{{calendarTitle}}</text>
+        <button class="calendar-card__arrow pressable" data-direction="1" bindtap="shiftCalendar">›</button>
+      </view>
+      <skeleton wx:if="{{calendarLoading}}" rows="4"></skeleton>
+      <error-state wx:elif="{{calendarError}}" title="日历暂时无法加载" bind:retry="retryCalendar"></error-state>
+      <view wx:else>
+        <view class="calendar-overview">
+          <view class="calendar-overview__item"><text class="calendar-overview__value">{{calendarOverview.activeDays}}</text><text class="calendar-overview__label">活跃天</text></view>
+          <view class="calendar-overview__item"><text class="calendar-overview__value calendar-overview__value--record">{{calendarOverview.studyDuration}}</text><text class="calendar-overview__label">学习投入</text></view>
+          <view class="calendar-overview__item"><text class="calendar-overview__value calendar-overview__value--course">{{calendarOverview.courseCount}}</text><text class="calendar-overview__label">课程</text></view>
+        </view>
+        <view class="calendar-grid">
+          <text wx:for="{{weekdays}}" wx:key="*this" class="calendar-grid__weekday">{{item}}</text>
+          <view wx:for="{{calendarDays}}" wx:key="date" class="calendar-day calendar-day--load-{{item.loadLevel}} {{item.currentMonth ? '' : 'calendar-day--muted'}} {{item.today ? 'calendar-day--today' : ''}} {{selectedDate === item.date ? 'calendar-day--selected' : ''}} pressable" data-date="{{item.date}}" bindtap="selectDate">
+            <view class="calendar-day__date"><text class="calendar-day__number">{{item.day}}</text><text wx:if="{{item.today}}" class="calendar-day__today-label">今</text></view>
+            <view class="calendar-day__facts">
+              <text wx:if="{{item.recordCount}}" class="calendar-day__fact calendar-day__fact--record">{{item.recordDurationLabel}}</text>
+              <text wx:if="{{item.courseCount}}" class="calendar-day__fact calendar-day__fact--course">{{item.courseLabel}}</text>
+              <text wx:if="{{!item.entryCount}}" class="calendar-day__empty">·</text>
+            </view>
+          </view>
+        </view>
+        <view class="calendar-card__legend"><text><text class="legend-line legend-line--record"></text>学习时长</text><text><text class="legend-line legend-line--course"></text>课程节数</text><text class="calendar-card__legend-note">投入越多，底色越深</text></view>
+        <view class="calendar-agenda">
+          <view class="calendar-agenda__head">
+            <view><text class="calendar-agenda__kicker">SELECTED DAY</text><text class="calendar-agenda__date">{{detailLabel}}</text></view>
+            <text class="calendar-agenda__count">{{detailEntryCount ? detailEntryCount + ' 项' : '留白日'}}</text>
+          </view>
+          <view wx:if="{{detailAgenda.length}}" class="calendar-agenda__list">
+            <view wx:for="{{detailAgenda}}" wx:key="key" class="calendar-agenda__row">
+              <text class="calendar-agenda__type calendar-agenda__type--{{item.type}}">{{item.typeLabel}}</text>
+              <view class="calendar-agenda__content"><text class="calendar-agenda__title">{{item.title}}</text><text class="calendar-agenda__meta">{{item.meta}}</text></view>
+            </view>
+            <view class="calendar-agenda__footer"><text>{{detailSummary}}</text><text class="calendar-agenda__more pressable" bindtap="openDetail">{{detailOverflowCount ? '另有 ' + detailOverflowCount + ' 项' : '查看详情'}} ›</text></view>
+          </view>
+          <view wx:else class="calendar-agenda__empty"><text class="calendar-agenda__empty-title">这一天还没有安排</text><text class="calendar-agenda__empty-copy">留一点空白，也是在为下一次专注蓄力。</text></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-gap stats-block">
+    <view class="stats-block__heading"><text class="section-title">学习统计</text><text class="muted">持续记录，才看得见变化。</text></view>
+    <skeleton wx:if="{{statsLoading}}" rows="2"></skeleton>
+    <error-state wx:elif="{{statsError}}" bind:retry="retryStats"></error-state>
+    <view wx:else class="stats-grid">
+      <view class="paper-card stats-tile"><text class="stats-tile__label">今日学习</text><text class="stats-tile__value">{{stats.todayStudyMinutes || 0}}</text><text class="stats-tile__unit">分钟</text></view>
+      <view class="paper-card stats-tile"><text class="stats-tile__label">今日专注</text><text class="stats-tile__value">{{stats.todayPomodoroCount || 0}}</text><text class="stats-tile__unit">次</text></view>
+      <view class="paper-card stats-tile"><text class="stats-tile__label">本周学习</text><text class="stats-tile__value">{{stats.weeklyStudyMinutes || 0}}</text><text class="stats-tile__unit">分钟</text></view>
+      <view class="paper-card stats-tile"><text class="stats-tile__label">连续学习</text><text class="stats-tile__value">{{stats.streakDays || 0}}</text><text class="stats-tile__unit">天</text></view>
+    </view>
+    <view class="paper-card paper-card--blue section-gap chart-card">
+      <view class="chart-card__heading"><text class="section-title">本周专注</text><text class="meta">周一 — 周日</text></view>
+      <view class="bar-chart"><view wx:for="{{weeklyBars}}" wx:key="label" class="bar-chart__item"><text class="bar-chart__value">{{item.value}}</text><view class="bar-chart__bar" style="height: {{item.height}}%;"></view><text class="bar-chart__label">{{item.label}}</text></view></view>
+    </view>
+    <view class="paper-card section-gap heatmap-card">
+      <view class="chart-card__heading"><text class="section-title">最近记录</text><text class="meta">30 天热力图</text></view>
+      <view class="heatmap"><view wx:for="{{heatmapCells}}" wx:key="date" class="heatmap__cell heatmap__cell--{{item.level}}" title="{{item.date}}"></view></view>
+    </view>
+  </view>
+
+  <view class="section-gap home-feed">
+    <view class="home-feed__heading"><text class="section-title">最近更新</text></view>
+    <skeleton wx:if="{{feedLoading}}" rows="3"></skeleton>
+    <view wx:else>
+      <view class="home-feed__section">
+        <view class="home-feed__subhead"><text>最新文章</text><text class="link-button pressable" bindtap="openBlog">查看全部</text></view>
+        <error-state wx:if="{{articleFeedError}}" title="文章暂时无法加载" bind:retry="retryArticles"></error-state>
+        <view wx:else><article-card wx:for="{{recentArticles}}" wx:key="id" item="{{item}}" bind:select="openArticle"></article-card><empty-state wx:if="{{!recentArticles.length}}" title="还没有公开文章" detail="文章发布后会出现在这里"></empty-state></view>
+      </view>
+      <view class="home-feed__section">
+        <view class="home-feed__subhead"><text>最近动态</text><text class="link-button pressable" bindtap="openMoments">查看全部</text></view>
+        <error-state wx:if="{{momentFeedError}}" title="动态暂时无法加载" bind:retry="retryMoments"></error-state>
+        <view wx:else><moment-card wx:for="{{recentMoments}}" wx:key="id" item="{{item}}" bind:preview="previewImages"></moment-card><empty-state wx:if="{{!recentMoments.length}}" title="还没有公开动态" detail="新的生活记录会出现在这里"></empty-state></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>
+
+<view wx:if="{{pomodoroOpen}}" class="pomodoro-modal__mask" catchtap="closePomodoro" catchtouchmove="noop">
+  <view class="pomodoro-modal pomodoro-modal--{{pomodoro.mode}}" catchtap="noop" aria-role="dialog" aria-label="番茄专注计时器">
+    <view class="pomodoro-modal__handle"></view>
+    <view class="pomodoro-modal__head">
+      <view>
+        <text class="eyebrow">POMODORO TIMER</text>
+        <text class="pomodoro-modal__title">一颗会提醒休息的小番茄</text>
+      </view>
+      <button class="pomodoro-modal__close pressable" bindtap="closePomodoro" aria-label="关闭番茄钟">×</button>
+    </view>
+
+    <view class="pomodoro-modes" aria-label="计时阶段">
+      <button class="pomodoro-modes__item {{pomodoro.mode === 'focus' ? 'pomodoro-modes__item--active' : ''}} pressable" data-mode="focus" bindtap="switchPomodoroMode">
+        <text>专注</text><text class="pomodoro-modes__time">{{pomodoro.focusDuration}} 分</text>
+      </button>
+      <button class="pomodoro-modes__item {{pomodoro.mode === 'shortBreak' ? 'pomodoro-modes__item--active' : ''}} pressable" data-mode="shortBreak" bindtap="switchPomodoroMode">
+        <text>短休息</text><text class="pomodoro-modes__time">5 分</text>
+      </button>
+      <button class="pomodoro-modes__item {{pomodoro.mode === 'longBreak' ? 'pomodoro-modes__item--active' : ''}} pressable" data-mode="longBreak" bindtap="switchPomodoroMode">
+        <text>长休息</text><text class="pomodoro-modes__time">20 分</text>
+      </button>
+    </view>
+
+    <view class="pomodoro-dial-wrap">
+      <view class="pomodoro-dial {{pomodoro.running ? 'pomodoro-dial--running' : ''}}">
+        <view class="pomodoro-dial__leaves" aria-hidden="true">
+          <view class="pomodoro-dial__stem"></view>
+          <view class="pomodoro-dial__leaf pomodoro-dial__leaf--one"></view>
+          <view class="pomodoro-dial__leaf pomodoro-dial__leaf--two"></view>
+          <view class="pomodoro-dial__leaf pomodoro-dial__leaf--three"></view>
+        </view>
+        <view wx:for="{{pomodoroTicks}}" wx:key="index" class="pomodoro-dial__tick {{item.major ? 'pomodoro-dial__tick--major' : ''}} {{pomodoroActiveTicks > item.index ? 'pomodoro-dial__tick--active' : ''}}" style="transform: rotate({{item.angle}}deg);">
+          <view class="pomodoro-dial__tick-line"></view>
+        </view>
+        <view class="pomodoro-dial__core">
+          <text class="pomodoro-dial__phase">{{pomodoroModeLabel}} · {{pomodoroStatusLabel}}</text>
+          <text class="pomodoro-dial__time">{{pomodoroDisplay}}</text>
+          <text class="pomodoro-dial__task">{{pomodoro.task || '先写下这一轮要完成的事'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="pomodoro-cycle">
+      <text class="pomodoro-cycle__label">{{pomodoroRoundLabel}}</text>
+      <view class="pomodoro-cycle__dots">
+        <view wx:for="{{pomodoroCycleMarkers}}" wx:key="index" class="pomodoro-cycle__dot pomodoro-cycle__dot--{{item.state}}"><text>{{item.index}}</text></view>
+      </view>
+    </view>
+
+    <view class="pomodoro-actions">
+      <button class="pomodoro-actions__round pressable" bindtap="resetPomodoro" aria-label="重置当前阶段">↺</button>
+      <button class="pomodoro-actions__primary pressable" bindtap="togglePomodoro">{{pomodoroPrimaryLabel}}</button>
+      <button class="pomodoro-actions__round pressable" bindtap="skipPomodoroPhase" aria-label="跳过当前阶段">→</button>
+    </view>
+
+    <view class="pomodoro-settings">
+      <view class="pomodoro-settings__head">
+        <text class="pomodoro-settings__title">本轮设置</text>
+        <button class="pomodoro-settings__save pressable" bindtap="applyPomodoroInputs">保存设置</button>
+      </view>
+      <view class="pomodoro-settings__task-row">
+        <text class="pomodoro-settings__label">专注任务</text>
+        <input class="pomodoro-settings__task" maxlength="40" value="{{pomodoroTaskInput}}" bindinput="onPomodoroTaskInput" disabled="{{pomodoro.running}}" placeholder="这一轮准备完成什么？" />
+      </view>
+      <view class="pomodoro-settings__duration-row">
+        <view><text class="pomodoro-settings__label">专注时长</text><text class="pomodoro-settings__note">休息阶段会自动衔接</text></view>
+        <view class="pomodoro-stepper">
+          <button class="pomodoro-stepper__button pressable" data-delta="-5" bindtap="adjustPomodoroDuration" aria-label="减少五分钟">−</button>
+          <input class="pomodoro-stepper__input" type="number" maxlength="3" value="{{pomodoroDurationInput}}" bindinput="onPomodoroDurationInput" bindblur="applyPomodoroInputs" disabled="{{pomodoro.running}}" />
+          <text class="pomodoro-stepper__unit">分</text>
+          <button class="pomodoro-stepper__button pressable" data-delta="5" bindtap="adjustPomodoroDuration" aria-label="增加五分钟">＋</button>
+        </view>
+      </view>
+    </view>
+    <text class="pomodoro-modal__hint">计时保存在本机；关闭弹窗后，小番茄仍会继续工作。</text>
+  </view>
+</view>
+
+<view wx:if="{{detailOpen}}" class="detail-sheet__mask" catchtap="closeDetail">
+  <view class="detail-sheet" catchtap="noop">
+    <view class="detail-sheet__handle"></view>
+    <view class="detail-sheet__heading"><view><text class="eyebrow">DAY DETAIL</text><text class="section-title">{{detailLabel}}</text></view><text class="detail-sheet__close pressable" bindtap="closeDetail">×</text></view>
+    <view wx:if="{{detailRecords.length}}" class="detail-sheet__group"><text class="detail-sheet__label">学习记录</text><view wx:for="{{detailRecords}}" wx:key="id" class="detail-row"><text>{{item.subject}}</text><text class="muted">{{item.duration}} 分钟</text></view></view>
+    <view wx:if="{{detailCourses.length}}" class="detail-sheet__group"><text class="detail-sheet__label">课程安排</text><view wx:for="{{detailCourses}}" wx:key="id" class="detail-row"><view><text>{{item.name}}</text><text class="detail-row__sub">{{item.location || '地点待补充'}}</text></view><text class="muted">{{item.startTime}} — {{item.endTime}}</text></view></view>
+    <empty-state wx:if="{{!detailRecords.length && !detailCourses.length}}" title="这一天还没有安排" detail="可以把注意力放回今天"></empty-state>
+  </view>
+</view>

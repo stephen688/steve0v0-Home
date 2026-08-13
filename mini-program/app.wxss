@@ -1,0 +1,261 @@
+page {
+  background: #fff9f2;
+  color: #24211f;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 28rpx;
+  line-height: 1.65;
+}
+
+view,
+scroll-view,
+swiper,
+button,
+input,
+textarea,
+text,
+image {
+  box-sizing: border-box;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+}
+
+button::after {
+  border: 0;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding: 0 32rpx 48rpx;
+  background:
+    radial-gradient(circle at 94% 13%, rgba(255, 208, 153, 0.18), transparent 28%),
+    #fff9f2;
+}
+
+.page-shell--article {
+  padding-bottom: 72rpx;
+}
+
+.brand-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 112rpx;
+  padding-top: env(safe-area-inset-top);
+}
+
+.brand-mark {
+  color: #24211f;
+  font-size: 32rpx;
+  font-weight: 800;
+  letter-spacing: 4rpx;
+}
+
+.brand-mark__accent {
+  color: #f45b12;
+}
+
+.capsule-hint {
+  display: flex;
+  align-items: center;
+  height: 56rpx;
+  padding: 0 20rpx;
+  border: 2rpx solid #ebe4dc;
+  border-radius: 30rpx;
+  background: rgba(255, 255, 255, 0.8);
+  color: #24211f;
+  font-size: 24rpx;
+  letter-spacing: 4rpx;
+}
+
+.capsule-hint__dot {
+  width: 8rpx;
+  height: 8rpx;
+  margin-right: 12rpx;
+  border-radius: 50%;
+  background: #24211f;
+  box-shadow: 16rpx 0 #24211f;
+}
+
+.section-gap {
+  margin-top: 24rpx;
+}
+
+.paper-card {
+  overflow: hidden;
+  border: 2rpx solid rgba(238, 229, 219, 0.75);
+  border-radius: 28rpx;
+  background: #fff;
+  box-shadow: 0 14rpx 38rpx rgba(111, 79, 46, 0.06);
+}
+
+.paper-card--warm {
+  background:
+    radial-gradient(circle at 94% 2%, rgba(255, 195, 119, 0.25), transparent 42%),
+    #fff0d9;
+}
+
+.paper-card--blue {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(98, 215, 241, 0.25), transparent 42%),
+    #f4fcfd;
+}
+
+.paper-card__body {
+  padding: 28rpx 30rpx;
+}
+
+.eyebrow {
+  color: #ad5c1b;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+  text-transform: uppercase;
+}
+
+.page-title {
+  margin-top: 10rpx;
+  color: #c9580d;
+  font-size: 58rpx;
+  font-weight: 800;
+  letter-spacing: 6rpx;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.page-subtitle {
+  margin-top: 12rpx;
+  color: #8d7665;
+  font-size: 24rpx;
+  letter-spacing: 3rpx;
+  text-align: center;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  color: #2c2723;
+  font-size: 32rpx;
+  font-weight: 800;
+}
+
+.section-title::before {
+  display: block;
+  width: 6rpx;
+  height: 28rpx;
+  margin-right: 14rpx;
+  border-radius: 4rpx;
+  background: #f45b12;
+  content: '';
+}
+
+.muted {
+  color: #927e6d;
+}
+
+.meta {
+  color: #897768;
+  font-size: 23rpx;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42rpx;
+  padding: 0 18rpx;
+  border: 2rpx solid #ebdac9;
+  border-radius: 24rpx;
+  background: #fff7ed;
+  color: #a05b1b;
+  font-size: 22rpx;
+  line-height: 1.2;
+}
+
+.pill--blue {
+  border-color: #cbd5ff;
+  background: #f3f5ff;
+  color: #6d7de5;
+}
+
+.pill--green {
+  border-color: #bfe8dc;
+  background: #f1fbf7;
+  color: #35977c;
+}
+
+.pill--gray {
+  border-color: #e6e0da;
+  background: #f5f3f1;
+  color: #776b61;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.segmented {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 6rpx;
+  border-radius: 42rpx;
+  background: #efefef;
+}
+
+.segmented__item {
+  flex: 1;
+  min-height: 68rpx;
+  border-radius: 36rpx;
+  color: #655c55;
+  font-size: 26rpx;
+  text-align: center;
+  line-height: 68rpx;
+}
+
+.segmented__item--active {
+  background: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(70, 50, 35, 0.08);
+  color: #a65b12;
+  font-weight: 700;
+}
+
+.pressable {
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.pressable:active {
+  opacity: 0.72;
+  transform: scale(0.985);
+}
+
+.link-button {
+  color: #d85c12;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.divider {
+  height: 2rpx;
+  margin: 26rpx 0;
+  background: #eee5db;
+}
+
+.page-state {
+  padding: 92rpx 28rpx;
+  color: #9b8778;
+  text-align: center;
+}
+
+.safe-bottom {
+  height: env(safe-area-inset-bottom);
+}

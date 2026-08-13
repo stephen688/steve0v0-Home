@@ -1,0 +1,3 @@
+<view class="tag-row">
+  <text wx:for="{{tags}}" wx:key="*this" class="pill pill--{{variant}}">{{item}}</text>
+</view>

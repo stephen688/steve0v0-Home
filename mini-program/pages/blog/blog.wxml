@@ -1,0 +1,43 @@
+<view class="page-shell blog-page">
+  <brand-header></brand-header>
+  <view class="blog-hero" aria-label="博客，{{total}}篇文章">
+    <view class="blog-hero__folio" aria-hidden="true">
+      <view class="blog-hero__folio-line"></view>
+      <text class="eyebrow">WRITING / NOTES</text>
+      <view class="blog-hero__folio-line blog-hero__folio-line--short"></view>
+    </view>
+
+    <view class="blog-title-group">
+      <text class="page-title">博客</text>
+      <view class="blog-title-mark" aria-hidden="true">
+        <view class="blog-title-mark__line"></view>
+        <view class="blog-title-mark__seal"></view>
+      </view>
+    </view>
+
+    <text class="page-subtitle">字里行间，藏着时光的密语</text>
+
+    <view class="blog-count">
+      <text class="blog-count__number">{{total}}</text>
+      <view class="blog-count__divider" aria-hidden="true"></view>
+      <text class="blog-count__label">篇文章</text>
+    </view>
+  </view>
+
+  <view class="segmented blog-tabs section-gap">
+    <text class="segmented__item {{category === 'tech' ? 'segmented__item--active' : ''}}" data-category="tech" bindtap="switchCategory">技术博客</text>
+    <text class="segmented__item {{category === 'life' ? 'segmented__item--active' : ''}}" data-category="life" bindtap="switchCategory">生活文章</text>
+  </view>
+
+  <view class="blog-list section-gap">
+    <skeleton wx:if="{{loading}}" rows="4"></skeleton>
+    <error-state wx:elif="{{error}}" title="文章暂时无法加载" detail="{{errorMessage}}" bind:retry="retry"></error-state>
+    <view wx:else>
+      <article-card wx:for="{{articles}}" wx:key="id" item="{{item}}" bind:select="openArticle"></article-card>
+      <empty-state wx:if="{{!articles.length}}" title="还没有这类文章" detail="换一个分类，或等下一次更新"></empty-state>
+      <view wx:if="{{articles.length && !hasMore}}" class="blog-end">已经到底了</view>
+      <view wx:if="{{loadingMore}}" class="blog-loading-more">正在加载更多…</view>
+    </view>
+  </view>
+  <view class="safe-bottom"></view>
+</view>

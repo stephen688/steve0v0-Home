@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "properties": {
+    "title": { "type": "String", "value": "这里还没有内容" },
+    "detail": { "type": "String", "value": "稍后再来看看" }
+  }
+}

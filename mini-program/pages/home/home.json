@@ -1,0 +1,11 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "brand-header": "/components/brand-header/brand-header",
+    "article-card": "/components/article-card/article-card",
+    "moment-card": "/components/moment-card/moment-card",
+    "empty-state": "/components/empty-state/empty-state",
+    "error-state": "/components/error-state/error-state",
+    "skeleton": "/components/skeleton/skeleton"
+  }
+}

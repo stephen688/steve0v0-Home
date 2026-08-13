@@ -1,0 +1,7 @@
+<view class="skeleton">
+  <view wx:for="{{rowList}}" wx:key="*this" class="skeleton__row">
+    <view class="skeleton__dot"></view>
+    <view class="skeleton__line skeleton__line--long"></view>
+    <view class="skeleton__line skeleton__line--short"></view>
+  </view>
+</view>

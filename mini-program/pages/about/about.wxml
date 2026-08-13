@@ -1,0 +1,50 @@
+<view class="page-shell about-page">
+  <brand-header></brand-header>
+
+  <view class="paper-card about-profile-card section-gap">
+    <view class="paper-card__body">
+      <skeleton wx:if="{{profileLoading}}" rows="2"></skeleton>
+      <error-state wx:elif="{{profileError}}" bind:retry="retryProfile"></error-state>
+      <view wx:else class="about-profile-content">
+        <view class="about-profile">
+          <view class="about-profile__avatar-wrap">
+            <image wx:if="{{profile.avatarUrl}}" class="about-profile__avatar" src="{{profile.avatarUrl}}" mode="aspectFill"></image>
+            <view wx:else class="about-profile__avatar about-profile__avatar--fallback">S</view>
+          </view>
+          <view class="about-profile__main"><text class="about-profile__name">{{profile.name || site.name}}</text><text class="about-profile__role">{{site.profession}}</text></view>
+        </view>
+        <view class="about-profile__statement">{{site.status}}</view>
+        <view class="about-profile__tags"><text wx:for="{{tags}}" wx:key="*this" class="about-profile__tag">{{item}}</text></view>
+        <view class="about-profile__meta"><text class="about-profile__meta-pill">{{site.location}}</text><text class="about-profile__meta-pill">{{site.motto}}</text></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="paper-card glass-card glass-card--skills about-skill-card section-gap" hover-class="glass-card--active" hover-start-time="20" hover-stay-time="180">
+    <view class="glass-card__sunlight" aria-hidden="true">
+      <view class="glass-card__sunbeam glass-card__sunbeam--wide"></view>
+      <view class="glass-card__sunbeam glass-card__sunbeam--soft"></view>
+    </view>
+    <view class="paper-card__body"><text class="section-title">技能</text><view wx:for="{{skills}}" wx:key="name" class="skill-row"><view class="skill-row__head"><text>{{item.name}} · {{item.detail}}</text><text>{{item.displayValue}}%</text></view><view class="skill-row__track"><view class="skill-row__progress" style="width: {{item.displayValue}}%;"></view></view></view></view>
+  </view>
+
+  <view class="paper-card glass-card glass-card--timeline about-timeline-card section-gap" hover-class="glass-card--active" hover-start-time="20" hover-stay-time="180">
+    <view class="glass-card__sunlight" aria-hidden="true">
+      <view class="glass-card__sunbeam glass-card__sunbeam--wide"></view>
+      <view class="glass-card__sunbeam glass-card__sunbeam--soft"></view>
+    </view>
+    <view class="paper-card__body"><text class="section-title">时间线</text><view class="timeline"><view wx:for="{{timeline}}" wx:key="date" class="timeline__item"><view class="timeline__dot"></view><view class="timeline__content"><text class="timeline__date">{{item.date}}</text><text class="timeline__title">{{item.title}}</text><text class="timeline__description">{{item.description}}</text></view></view></view></view>
+  </view>
+
+  <view class="about-project-section section-gap"><view class="about-section-heading"><text class="section-title">项目</text></view><skeleton wx:if="{{projectLoading}}" rows="3"></skeleton><error-state wx:elif="{{projectError}}" bind:retry="retryProjects"></error-state><view wx:else><project-card wx:for="{{projects}}" wx:key="id" item="{{item}}"></project-card><empty-state wx:if="{{!projects.length}}" title="还没有公开项目" detail="项目添加后会出现在这里"></empty-state></view></view>
+
+  <view class="paper-card glass-card glass-card--contact about-contact-card section-gap" hover-class="glass-card--active" hover-start-time="20" hover-stay-time="180">
+    <view class="glass-card__sunlight" aria-hidden="true">
+      <view class="glass-card__sunbeam glass-card__sunbeam--wide"></view>
+      <view class="glass-card__sunbeam glass-card__sunbeam--soft"></view>
+    </view>
+    <view class="paper-card__body"><text class="section-title">联系方式</text><view wx:for="{{contacts}}" wx:key="label" class="contact-row"><view class="contact-row__label">{{item.label}}</view><text class="contact-row__value">{{item.value || '待补充'}}</text><view wx:if="{{item.copyable && item.value}}" class="contact-row__copy pressable" data-index="{{index}}" bindtap="copyContact">复制</view></view></view>
+  </view>
+  <view class="about-footer">保持好奇，继续构建。</view>
+  <view class="safe-bottom"></view>
+</view>
