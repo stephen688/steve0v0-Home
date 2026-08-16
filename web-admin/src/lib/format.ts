@@ -27,6 +27,7 @@ export function stateLabel(state: string | null | undefined): string {
   const labels: Record<string, string> = {
     online: '在线',
     studying: '学习中',
+    exercising: '运动中',
     busy: '忙碌',
     rest: '休息'
   }

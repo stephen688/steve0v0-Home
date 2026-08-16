@@ -20,12 +20,12 @@
         <text>生活动态</text>
       </view>
     </view>
-    <picker class="moments-sort" mode="selector" range="{{sortOptions}}" value="{{sortIndex}}" disabled="{{loading || loadingMore}}" bindchange="changeSort">
-      <view class="moments-sort__trigger pressable" role="button" aria-label="动态排序，当前{{sortLabel}}">
+    <view class="moments-sort">
+      <button class="moments-sort__trigger pressable" role="button" disabled="{{loading || loadingMore}}" bindtap="toggleSort" aria-label="点击切换动态排序，当前{{sortLabel}}">
         <text class="moments-sort__arrow">{{sortArrow}}</text>
         <text>{{sortLabel}}</text>
-      </view>
-    </picker>
+      </button>
+    </view>
   </view>
   <view class="moments-list section-gap">
     <skeleton wx:if="{{loading}}" rows="5"></skeleton>

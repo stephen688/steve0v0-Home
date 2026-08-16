@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS course (
 -- ============================================
 CREATE TABLE IF NOT EXISTS personal_status (
     id            BIGINT       NOT NULL COMMENT '主键，固定为1',
-    state         VARCHAR(20)  NOT NULL DEFAULT 'online' COMMENT '状态：online/studying/busy/rest',
+    state         VARCHAR(20)  NOT NULL DEFAULT 'online' COMMENT '状态：online/studying/exercising/busy/rest',
     current_task  VARCHAR(200)          DEFAULT NULL COMMENT '当前正在做的事',
     mood          VARCHAR(200)          DEFAULT NULL COMMENT '心情签名',
     updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

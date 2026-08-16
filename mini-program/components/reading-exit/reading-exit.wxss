@@ -1,15 +1,15 @@
 .reading-exit {
   display: flex;
   align-items: center;
-  width: 142rpx;
+  width: 100%;
   min-width: 0;
-  height: 48rpx;
-  padding: 0 11rpx 0 8rpx;
-  border: 2rpx solid rgba(226, 205, 186, 0.92);
-  border-radius: 28rpx;
-  background: #fffdf9;
-  box-shadow: 0 7rpx 18rpx rgba(78, 52, 32, 0.10);
-  color: #3d332c;
+  height: 100%;
+  padding: 0 12rpx 0 10rpx;
+  border: 1rpx solid rgba(31, 27, 24, 0.18);
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 2rpx 6rpx rgba(36, 28, 22, 0.08);
+  color: #24211f;
   line-height: 1;
   transition: opacity 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
@@ -20,26 +20,26 @@
 
 .reading-exit:active {
   opacity: 0.82;
-  box-shadow: 0 4rpx 12rpx rgba(78, 52, 32, 0.10);
+  box-shadow: 0 2rpx 4rpx rgba(36, 28, 22, 0.08);
   transform: translateY(2rpx) scale(0.98);
 }
 
 .reading-exit__icon {
   position: relative;
   flex: none;
-  width: 28rpx;
-  height: 28rpx;
-  margin-right: 6rpx;
-  border: 2rpx solid #f0d3b8;
+  width: 24rpx;
+  height: 24rpx;
+  margin-right: 5rpx;
+  border: 1rpx solid #efc89f;
   border-radius: 50%;
   background: #fff3e7;
 }
 
 .reading-exit__arrow::before {
   position: absolute;
-  top: 12rpx;
-  left: 8rpx;
-  width: 13rpx;
+  top: 10rpx;
+  left: 7rpx;
+  width: 11rpx;
   height: 2rpx;
   border-radius: 2rpx;
   background: #df650d;
@@ -48,8 +48,8 @@
 
 .reading-exit__arrow::after {
   position: absolute;
-  top: 9rpx;
-  left: 8rpx;
+  top: 7rpx;
+  left: 7rpx;
   width: 6rpx;
   height: 6rpx;
   border-bottom: 2rpx solid #df650d;
@@ -60,9 +60,6 @@
 
 .reading-exit__label {
   display: block;
-}
-
-.reading-exit__label {
   color: #3d332c;
   font-size: 20rpx;
   font-weight: 700;

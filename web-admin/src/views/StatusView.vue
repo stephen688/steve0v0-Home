@@ -62,7 +62,7 @@ onMounted(loadStatus)
     <section v-else class="paper-card paper-card--ruled p-5">
       <h3 class="form-section-title">状态信息</h3>
       <div class="form-grid">
-        <div><label class="field-label" for="status-state">当前状态</label><select id="status-state" v-model="state" class="field-select"><option value="online">在线</option><option value="studying">学习中</option><option value="busy">忙碌</option><option value="rest">休息</option></select><p class="field-hint">当前预览：{{ stateLabel(state) }}</p></div>
+        <div><label class="field-label" for="status-state">当前状态</label><select id="status-state" v-model="state" class="field-select"><option value="online">在线</option><option value="studying">学习中</option><option value="exercising">运动中</option><option value="busy">忙碌</option><option value="rest">休息</option></select><p class="field-hint">当前预览：{{ stateLabel(state) }}</p></div>
         <div><label class="field-label" for="status-task">当前正在做的事</label><input id="status-task" v-model="currentTask" class="field-input" maxlength="200" placeholder="例如：整理前端页面" /></div>
         <div><label class="field-label" for="status-mood">心情签名</label><input id="status-mood" v-model="mood" class="field-input" maxlength="200" placeholder="例如：慢慢来，比较快" /></div>
         <div class="notice"><Activity class="mt-0.5 h-4 w-4 shrink-0" /><span>留空表示清空对应内容；只提交发生变化的字段。</span></div>

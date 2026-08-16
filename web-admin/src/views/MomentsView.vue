@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { Image, Plus, RefreshCw, Trash2 } from '@lucide/vue'
+import { Image, MapPin, Plus, RefreshCw, Trash2 } from '@lucide/vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { deleteMoment, getAdminMoments, resolveAssetUrl, type MomentItem } from '@/api/admin'
@@ -90,10 +90,11 @@ onMounted(() => loadMoments())
           <span class="tape-badge badge-category">{{ moment.mediaType === 'image' ? '图片动态' : '文字动态' }}</span>
           <button class="icon-button hover:text-destructive" type="button" aria-label="删除动态" title="删除" @click="deleteTarget = moment"><Trash2 class="h-4 w-4" /></button>
         </div>
-        <p class="moment-content">{{ moment.content }}</p>
+        <p v-if="moment.content" class="moment-content">{{ moment.content }}</p>
         <div v-if="moment.mediaType === 'image' && moment.images.length" class="media-grid">
           <img v-for="(image, index) in moment.images" :key="`${moment.id}-${image}-${index}`" :src="resolveAssetUrl(image)" :alt="`动态图片 ${index + 1}`" loading="lazy" />
         </div>
+        <p v-if="moment.location" class="mt-3 flex items-center gap-1.5 text-xs muted-text"><MapPin class="h-3.5 w-3.5" />{{ moment.location }}</p>
         <div class="moment-meta"><span>{{ moment.images.length ? `${moment.images.length} 张图片` : '纯文字' }}</span><span>{{ formatDateTime(moment.createdAt) }}</span></div>
       </article>
     </div>

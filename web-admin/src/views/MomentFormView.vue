@@ -18,6 +18,8 @@ interface UploadEntry {
 const router = useRouter()
 const { showToast } = useToast()
 const content = ref('')
+const createdAt = ref('')
+const location = ref('')
 const mediaType = ref<'text' | 'image'>('text')
 const uploads = ref<UploadEntry[]>([])
 const isDragging = ref(false)
@@ -29,7 +31,10 @@ const completedUploads = computed(() => uploads.value.filter((item) => item.stat
 
 function addFiles(files: FileList | File[]) {
   mediaType.value = 'image'
-  Array.from(files).forEach((file) => {
+  const candidates = Array.from(files).filter((file) => file.type.startsWith('image/'))
+  const remaining = Math.max(0, 9 - uploads.value.length)
+  if (candidates.length > remaining) error.value = '每条动态最多上传 9 张图片'
+  candidates.slice(0, remaining).forEach((file) => {
     if (!file.type.startsWith('image/')) return
     const entry: UploadEntry = {
       id: nextUploadId++,
@@ -81,8 +86,8 @@ function handleImageInput(event: Event) {
 
 async function submit() {
   error.value = ''
-  if (!content.value.trim()) {
-    error.value = '请填写动态内容'
+  if (!content.value.trim() && !location.value.trim() && !completedUploads.value.length) {
+    error.value = '请填写动态内容、地点或上传图片'
     return
   }
   if (mediaType.value === 'image' && uploads.value.some((item) => item.state === 'uploading')) {
@@ -97,7 +102,9 @@ async function submit() {
   const payload: MomentPayload = {
     content: content.value.trim(),
     mediaType: mediaType.value,
-    images: completedUploads.value.map((item) => item.url)
+    images: completedUploads.value.map((item) => item.url),
+    ...(location.value.trim() ? { location: location.value.trim() } : {}),
+    ...(createdAt.value ? { createdAt: `${createdAt.value}:00` } : {})
   }
   try {
     await createMoment(payload)
@@ -130,6 +137,18 @@ onUnmounted(() => uploads.value.forEach((entry) => URL.revokeObjectURL(entry.pre
         </div>
 
         <div>
+          <label class="field-label" for="moment-created-at">原始发布时间</label>
+          <input id="moment-created-at" v-model="createdAt" class="field-input" type="datetime-local" />
+          <p class="field-hint">搬运历史动态时填写朋友圈时间；留空则按发布时刻记录。</p>
+        </div>
+
+        <div>
+          <label class="field-label" for="moment-location">原始地点</label>
+          <input id="moment-location" v-model="location" class="field-input" maxlength="200" placeholder="例如：广州市·小洲村" />
+          <p class="field-hint">朋友圈没有显示地点时留空。</p>
+        </div>
+
+        <div>
           <span class="field-label">媒体类型</span>
           <div class="filter-group w-fit">
             <button class="filter-tab" :class="{ 'is-active': mediaType === 'text' }" type="button" @click="mediaType = 'text'">文字</button>
@@ -142,7 +161,7 @@ onUnmounted(() => uploads.value.forEach((entry) => URL.revokeObjectURL(entry.pre
           <label class="upload-zone cursor-pointer" :class="{ 'is-dragging': isDragging }" for="moment-images" @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false" @drop="handleDrop">
             <ImagePlus class="mb-2 h-6 w-6" />
             <strong>拖拽或点击上传图片</strong>
-            <span class="mt-1 text-xs">可选择多张，上传后可调整顺序</span>
+            <span class="mt-1 text-xs">最多 9 张，上传后可调整顺序</span>
             <input id="moment-images" type="file" accept="image/jpeg,image/png,image/gif" multiple @change="handleImageInput" />
           </label>
           <div v-if="uploads.length" class="upload-list">

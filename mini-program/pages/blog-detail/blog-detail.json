@@ -1,9 +1,7 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
-    "brand-header": "/components/brand-header/brand-header",
     "reading-exit": "/components/reading-exit/reading-exit",
-    "tag-list": "/components/tag-list/tag-list",
     "error-state": "/components/error-state/error-state",
     "skeleton": "/components/skeleton/skeleton"
   }

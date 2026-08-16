@@ -14,6 +14,7 @@ public class MomentListVO {
     private String content;
     private String mediaType;
     private String mediaUrl;
+    private String location;
     private LocalDateTime createdAt;
     /** 图片 URL 列表，按 sort 排序 */
     private List<String> images;

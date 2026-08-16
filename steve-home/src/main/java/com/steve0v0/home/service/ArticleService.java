@@ -9,6 +9,7 @@ import com.steve0v0.home.common.result.ResultCode;
 import com.steve0v0.home.common.pagination.PageResult;
 import com.steve0v0.home.dto.ArticleCreateDTO;
 import com.steve0v0.home.dto.ArticleQueryDTO;
+import com.steve0v0.home.dto.ArticleUpdateDTO;
 import com.steve0v0.home.entity.Article;
 import com.steve0v0.home.mapper.ArticleMapper;
 import com.steve0v0.home.vo.ArticleDetailVO;
@@ -61,6 +62,7 @@ public class ArticleService {
         vo.setCoverImage(article.getCoverImage());
         vo.setCategory(article.getCategory());
         vo.setTags(article.getTags());
+        vo.setStatus(article.getStatus());
         vo.setViewCount(article.getViewCount());
         vo.setPublishedAt(article.getPublishedAt());
         vo.setReadTimeMinutes(calculateReadTime(article.getContent()));
@@ -179,24 +181,46 @@ public class ArticleService {
      */
     public Long createArticle(ArticleCreateDTO dto) {
         Article article = new Article();
-        article.setTitle(dto.getTitle());
-        article.setSummary(dto.getSummary());
-        article.setContent(dto.getContent());
-        article.setCoverImage(dto.getCoverImage());
-        // 分类默认 tech
-        article.setCategory(dto.getCategory() != null ? dto.getCategory() : Constants.CATEGORY_TECH);
-        article.setTags(dto.getTags());
-        // 状态默认草稿
-        int status = dto.getStatus() != null ? dto.getStatus() : Constants.ARTICLE_STATUS_DRAFT;
-        article.setStatus(status);
+        applyEditableFields(article, dto);
         article.setViewCount(0);
         // 首次发布时写入 published_at
-        if (status == Constants.ARTICLE_STATUS_PUBLISHED) {
+        if (article.getStatus() == Constants.ARTICLE_STATUS_PUBLISHED) {
             article.setPublishedAt(LocalDateTime.now());
         }
         articleMapper.insert(article);
         log.info("新建文章成功 | id={} | title={}", article.getId(), article.getTitle());
         return article.getId();
+    }
+
+    /**
+     * 修改文章。
+     * 已发布文章的原发布时间保持不变；草稿发布时才写入发布时间。
+     */
+    public void updateArticle(Long id, ArticleUpdateDTO dto) {
+        Article article = articleMapper.selectById(id);
+        if (article == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND);
+        }
+
+        applyEditableFields(article, dto);
+        if (article.getStatus() == Constants.ARTICLE_STATUS_PUBLISHED) {
+            if (article.getPublishedAt() == null) {
+                article.setPublishedAt(LocalDateTime.now());
+            }
+        }
+
+        articleMapper.updateById(article);
+        log.info("修改文章成功 | id={} | title={} | status={}", id, article.getTitle(), article.getStatus());
+    }
+
+    private void applyEditableFields(Article article, ArticleCreateDTO dto) {
+        article.setTitle(dto.getTitle());
+        article.setSummary(dto.getSummary());
+        article.setContent(dto.getContent());
+        article.setCoverImage(dto.getCoverImage());
+        article.setCategory(dto.getCategory() != null ? dto.getCategory() : Constants.CATEGORY_TECH);
+        article.setTags(dto.getTags());
+        article.setStatus(dto.getStatus() != null ? dto.getStatus() : Constants.ARTICLE_STATUS_DRAFT);
     }
 
     /**

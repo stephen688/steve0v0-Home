@@ -21,6 +21,8 @@ public class Moment {
     private String mediaType;
     /** 音乐/视频外链 URL（第一阶段不使用） */
     private String mediaUrl;
+    /** 朋友圈发布时携带的原始地点 */
+    private String location;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

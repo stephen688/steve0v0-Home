@@ -18,12 +18,12 @@ export const SITE_CONFIG = {
   profession: '全栈开发 · AI Agent 探索者',
   location: '广州',
   email: '6715425@qq.com',
-  status: '持续探索中',
+  status: '摸鱼中',
   tags: ['Spring Boot', '全栈开发', 'Vue 3', 'AI Agent'],
   skills: [
-    { name: 'Frontend', value: 28, detail: 'Vue 3 / TypeScript' },
+    { name: 'Frontend', value: 28, detail: 'HTML/CSS/JavaScript/Vue 3' },
     { name: 'Backend', value: 70, detail: 'Java / Spring Boot' },
-    { name: 'AI Agent', value: 46, detail: 'Prompt / Tool / RAG' },
+    { name: 'AI Agent', value: 46, detail: 'Prompt / Context / RAG' },
     { name: 'DevOps', value: 50, detail: 'Docker / Linux / Git' },
     { name: 'Design', value: 24, detail: 'Figma / UI / UX' }
   ] as SkillConfig[],
@@ -41,7 +41,7 @@ export const SITE_CONFIG = {
     {
       date: '2026.04',
       title: '全栈项目实战',
-      description: '从 0 到 1 搭建 QuantaCommunity 前后端，不断学习新框架，熟悉全栈开发流程。'
+      description: '从 0 到 1 搭建 QuantaCommunity 前后端，不断学习新技术，熟悉全栈开发流程。'
     },
     {
       date: '2026.07',

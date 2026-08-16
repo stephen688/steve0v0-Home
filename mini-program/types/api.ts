@@ -86,6 +86,7 @@ export interface MomentItem {
   content: string;
   mediaType: string;
   mediaUrl: string;
+  location: string;
   createdAt: string;
   images: string[];
 }

@@ -39,7 +39,7 @@ const shortcuts = [
   { label: '更新个人状态', desc: '让首页状态保持准确', path: '/status', icon: Activity }
 ]
 
-const articleStatus = (article: ArticleList) => article.publishedAt ? '已发布' : '草稿'
+const articleStatus = (article: ArticleList) => article.status === 1 ? '已发布' : '草稿'
 const statusTone = computed(() => status.value ? `state-${status.value.state}` : '')
 
 async function loadDashboard() {
@@ -160,7 +160,7 @@ onMounted(loadDashboard)
             <tbody>
               <tr v-for="article in articles" :key="article.id">
                 <td><router-link class="table-title-link" :to="`/articles/${article.id}`">{{ article.title }}</router-link></td>
-                <td><span class="tape-badge" :class="article.publishedAt ? 'badge-published' : 'badge-draft'">{{ articleStatus(article) }}</span></td>
+                <td><span class="tape-badge" :class="article.status === 1 ? 'badge-published' : 'badge-draft'">{{ articleStatus(article) }}</span></td>
                 <td class="num mono muted-text">{{ formatDateTime(article.publishedAt) }}</td>
               </tr>
             </tbody>

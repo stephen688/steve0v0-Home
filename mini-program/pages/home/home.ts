@@ -68,19 +68,33 @@ interface PomodoroCycleMarker {
 const today = new Date();
 const dateKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 const POMODORO_STORAGE_KEY = 'steve-home-pomodoro';
+const STATUS_PET_STORAGE_KEY = 'steve-home-status-pet-position';
+const STATUS_PET_WIDTH_RPX = 188;
+const STATUS_PET_HEIGHT_RPX = 238;
+const STATUS_PET_AREA_VERTICAL_RPX = 224;
+const POMODORO_DEFAULT_FOCUS_MINUTES = 40;
 const POMODORO_DURATIONS: Record<PomodoroMode, number> = {
-  focus: 25,
+  focus: POMODORO_DEFAULT_FOCUS_MINUTES,
   shortBreak: 5,
   longBreak: 20
 };
+const POMODORO_DURATION_PRESETS = [
+  { value: '25', label: '轻量' },
+  { value: '40', label: '标准' },
+  { value: '50', label: '深度' }
+];
 const POMODORO_TICKS: PomodoroTick[] = Array.from({ length: 60 }, (_, index) => ({
   index,
   angle: index * 6,
   major: index % 5 === 0
 }));
 
-function clampFocusDuration(value: unknown, fallback = 25) {
+function clampFocusDuration(value: unknown, fallback = POMODORO_DEFAULT_FOCUS_MINUTES) {
   return Math.min(180, Math.max(1, Number(value) || fallback));
+}
+
+function clampNumber(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
 }
 
 function isPomodoroMode(value: unknown): value is PomodoroMode {
@@ -96,7 +110,7 @@ function durationForMode(mode: PomodoroMode, focusDuration: number) {
   return mode === 'focus' ? focusDuration : POMODORO_DURATIONS[mode];
 }
 
-function buildPomodoroState(mode: PomodoroMode = 'focus', focusDuration = 25, task = '', completedFocusRounds = 0): PomodoroState {
+function buildPomodoroState(mode: PomodoroMode = 'focus', focusDuration = POMODORO_DEFAULT_FOCUS_MINUTES, task = '', completedFocusRounds = 0): PomodoroState {
   const safeFocusDuration = clampFocusDuration(focusDuration);
   const duration = durationForMode(mode, safeFocusDuration);
   return {
@@ -115,9 +129,17 @@ function buildPomodoroState(mode: PomodoroMode = 'focus', focusDuration = 25, ta
 function normalizePomodoroState(stored?: Partial<PomodoroState>): PomodoroState {
   if (!stored) return buildPomodoroState();
   const mode = isPomodoroMode(stored.mode) ? stored.mode : 'focus';
-  const focusDuration = clampFocusDuration(stored.focusDuration ?? stored.duration);
+  const storedFocusDuration = clampFocusDuration(stored.focusDuration ?? stored.duration);
+  const storedModeDuration = durationForMode(mode, storedFocusDuration);
+  const storedRemaining = Number(stored.remaining);
+  const remainingAtStart = !stored.running && storedRemaining === storedModeDuration * 60;
+  const focusDuration = storedFocusDuration === 25 && remainingAtStart
+    ? POMODORO_DEFAULT_FOCUS_MINUTES
+    : storedFocusDuration;
   const duration = durationForMode(mode, focusDuration);
-  const remaining = Math.min(duration * 60, Math.max(0, Number(stored.remaining) || 0));
+  const remaining = remainingAtStart
+    ? duration * 60
+    : Math.min(duration * 60, Math.max(0, storedRemaining || 0));
   return {
     duration,
     focusDuration,
@@ -294,20 +316,25 @@ Page({
     momentFeedError: false,
     pomodoroOpen: false,
     pomodoro: buildPomodoroState(),
+    pomodoroDurationPresets: POMODORO_DURATION_PRESETS,
     pomodoroTicks: POMODORO_TICKS,
     pomodoroActiveTicks: 60,
-    pomodoroDisplay: '25:00',
+    pomodoroDisplay: '40:00',
     pomodoroModeLabel: '专注',
     pomodoroStatusLabel: '准备开始',
     pomodoroPrimaryLabel: '开始专注',
     pomodoroRoundLabel: '第 1 / 4 轮',
     pomodoroCycleMarkers: buildPomodoroView(buildPomodoroState()).pomodoroCycleMarkers,
-    pomodoroDurationInput: '25',
+    pomodoroDurationInput: String(POMODORO_DEFAULT_FOCUS_MINUTES),
     pomodoroTaskInput: '',
-    pomodoroInterval: 0
+    pomodoroInterval: 0,
+    statusPetX: 0,
+    statusPetY: 10,
+    statusPetReady: false
   },
 
   onLoad() {
+    this.restoreStatusPetPosition();
     this.restorePomodoro();
     this.loadAll();
   },
@@ -318,12 +345,18 @@ Page({
   },
 
   onHide() {
+    this.saveStatusPetPosition();
     this.persistPomodoro();
     this.stopPomodoroInterval();
   },
 
   onUnload() {
+    this.saveStatusPetPosition();
     this.stopPomodoroInterval();
+  },
+
+  onResize() {
+    this.restoreStatusPetPosition();
   },
 
   onPullDownRefresh() {
@@ -397,6 +430,39 @@ Page({
   retryFeeds() { this.loadFeeds(); },
   retryArticles() { api.getArticles(undefined, 1, 2).then((articles) => this.setData({ recentArticles: articles.list.map(prepareArticle), articleFeedError: false })).catch(() => this.setData({ articleFeedError: true })); },
   retryMoments() { api.getMoments(1, 2).then((moments) => this.setData({ recentMoments: moments.list.map(prepareMoment), momentFeedError: false })).catch(() => this.setData({ momentFeedError: true })); },
+
+  restoreStatusPetPosition() {
+    const windowInfo = typeof wx.getWindowInfo === 'function' ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const windowWidth = Number(windowInfo.windowWidth) || 375;
+    const windowHeight = Number(windowInfo.windowHeight) || 667;
+    const safeArea = windowInfo.safeArea || {};
+    const safeTop = Math.max(0, Number(safeArea.top) || 0);
+    const safeBottom = Math.max(0, (Number(windowInfo.screenHeight) || windowHeight) - (Number(safeArea.bottom) || Number(windowInfo.screenHeight) || windowHeight));
+    const rpx = windowWidth / 750;
+    const maxX = Math.max(0, windowWidth - STATUS_PET_WIDTH_RPX * rpx);
+    const areaHeight = windowHeight - STATUS_PET_AREA_VERTICAL_RPX * rpx - safeTop - safeBottom;
+    const maxY = Math.max(0, areaHeight - STATUS_PET_HEIGHT_RPX * rpx);
+    const stored = wx.getStorageSync(STATUS_PET_STORAGE_KEY) as { x?: number; y?: number } | undefined;
+    const storedX = Number(stored?.x);
+    const storedY = Number(stored?.y);
+    const x = Number.isFinite(storedX) ? clampNumber(storedX, 0, maxX) : Math.max(0, maxX - 8);
+    const y = Number.isFinite(storedY) ? clampNumber(storedY, 0, maxY) : Math.max(0, maxY - 12);
+    this.statusPetPosition = { x, y };
+    this.setData({ statusPetX: x, statusPetY: y, statusPetReady: true });
+  },
+
+  onStatusPetMove(event: WechatPageEvent) {
+    const x = Number(event.detail?.x);
+    const y = Number(event.detail?.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    this.statusPetPosition = { x, y };
+  },
+
+  saveStatusPetPosition() {
+    if (!this.data.statusPetReady) return;
+    const position = this.statusPetPosition || { x: this.data.statusPetX, y: this.data.statusPetY };
+    wx.setStorageSync(STATUS_PET_STORAGE_KEY, position);
+  },
 
   switchCalendarView(event: WechatPageEvent) {
     const view = event.currentTarget?.dataset?.view as 'month' | 'week';
@@ -482,6 +548,7 @@ Page({
       : this.data.pomodoro.completedFocusRounds;
     const pomodoro = buildPomodoroState(mode, clampFocusDuration(this.data.pomodoroDurationInput), this.data.pomodoroTaskInput.trim(), completedFocusRounds);
     this.updatePomodoro(pomodoro);
+    wx.vibrateShort({ type: 'light' });
   },
 
   adjustPomodoroDuration(event: WechatPageEvent) {
@@ -491,8 +558,18 @@ Page({
     }
     const delta = Number(event.currentTarget?.dataset?.delta || 0);
     const duration = clampFocusDuration(Number(this.data.pomodoroDurationInput) + delta);
-    this.setData({ pomodoroDurationInput: String(duration) });
-    this.applyPomodoroInputs();
+    this.setData({ pomodoroDurationInput: String(duration) }, () => this.applyPomodoroInputs());
+    wx.vibrateShort({ type: 'light' });
+  },
+
+  setPomodoroDurationPreset(event: WechatPageEvent) {
+    if (this.data.pomodoro.running) {
+      wx.showToast({ title: '计时中不可修改', icon: 'none' });
+      return;
+    }
+    const duration = clampFocusDuration(event.currentTarget?.dataset?.duration);
+    this.setData({ pomodoroDurationInput: String(duration) }, () => this.applyPomodoroInputs());
+    wx.vibrateShort({ type: 'light' });
   },
 
   applyPomodoroInputs() {
@@ -512,7 +589,18 @@ Page({
     this.updatePomodoro(pomodoro);
   },
 
+  savePomodoroSettings() {
+    if (this.data.pomodoro.running) {
+      wx.showToast({ title: '请先暂停当前计时', icon: 'none' });
+      return;
+    }
+    this.applyPomodoroInputs();
+    wx.vibrateShort({ type: 'light' });
+    wx.showToast({ title: '设置已应用', icon: 'none' });
+  },
+
   togglePomodoro() {
+    wx.vibrateShort({ type: 'light' });
     if (this.data.pomodoro.completed) {
       this.advancePomodoro(true);
       return;
@@ -548,6 +636,8 @@ Page({
     );
     this.stopPomodoroInterval();
     this.updatePomodoro(pomodoro);
+    wx.vibrateShort({ type: 'light' });
+    wx.showToast({ title: '本轮已重置', icon: 'none' });
   },
 
   skipPomodoroPhase() {

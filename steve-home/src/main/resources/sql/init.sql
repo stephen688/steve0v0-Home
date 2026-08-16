@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS moment (
     content     TEXT                  DEFAULT NULL COMMENT '动态内容',
     media_type  VARCHAR(20)  NOT NULL DEFAULT 'text' COMMENT '媒体类型：text-纯文字 / image-多图 / music-音乐 / video-视频（第一阶段仅开放text和image）',
     media_url   VARCHAR(500)          DEFAULT NULL COMMENT '音乐/视频外链 URL（第一阶段不使用）',
+    location    VARCHAR(200)          DEFAULT NULL COMMENT '朋友圈发布时携带的原始地点',
     created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (id),

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { Eye, FileText, Plus, RefreshCw, Trash2 } from '@lucide/vue'
+import { Eye, FileText, Pencil, Plus, RefreshCw, Trash2 } from '@lucide/vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import PaginationBar from '@/components/ui/PaginationBar.vue'
@@ -116,13 +116,14 @@ onMounted(loadArticles)
               <p v-if="article.summary" class="mt-1 max-w-[320px] truncate text-xs muted-text">{{ article.summary }}</p>
             </td>
             <td><span class="tape-badge badge-category">{{ categoryLabel(article.category) }}</span></td>
-            <td><span class="tape-badge" :class="article.publishedAt ? 'badge-published' : 'badge-draft'">{{ article.publishedAt ? '已发布' : '草稿' }}</span></td>
+            <td><span class="tape-badge" :class="article.status === 1 ? 'badge-published' : 'badge-draft'">{{ article.status === 1 ? '已发布' : '草稿' }}</span></td>
             <td><div class="flex max-w-[180px] flex-wrap gap-1"><span v-for="tag in parseTags(article.tags).slice(0, 3)" :key="tag" class="tag-chip">{{ tag }}</span><span v-if="parseTags(article.tags).length > 3" class="tag-chip">+{{ parseTags(article.tags).length - 3 }}</span></div></td>
             <td class="num mono muted-text text-xs">{{ formatDateTime(article.publishedAt) }}</td>
             <td class="num mono muted-text text-xs">{{ article.viewCount }} 阅读 · {{ article.readTimeMinutes }} 分钟</td>
             <td>
               <div class="flex justify-end gap-1">
                 <router-link class="icon-button no-underline" :to="`/articles/${article.id}`" title="查看" aria-label="查看文章"><Eye class="h-4 w-4" /></router-link>
+                <router-link class="icon-button no-underline" :to="`/articles/${article.id}/edit`" title="编辑" aria-label="编辑文章"><Pencil class="h-4 w-4" /></router-link>
                 <button class="icon-button hover:text-destructive" type="button" title="删除" aria-label="删除文章" @click="deleteTarget = article"><Trash2 class="h-4 w-4" /></button>
               </div>
             </td>

@@ -46,7 +46,9 @@ export function formatState(value: string | null | undefined): string {
   const map: Record<string, string> = {
     online: '在线',
     studying: '学习中',
+    exercising: '运动中',
     busy: '忙碌',
+    rest: '休息',
     resting: '休息'
   };
   return map[value || ''] || value || '状态待更新';

@@ -34,6 +34,12 @@ const router = createRouter({
           meta: { title: '新建文章', width: 'wide' }
         },
         {
+          path: '/articles/:id/edit',
+          name: 'ArticleEdit',
+          component: () => import('@/views/ArticleFormView.vue'),
+          meta: { title: '编辑文章', width: 'wide' }
+        },
+        {
           path: '/articles/:id',
           name: 'ArticleDetail',
           component: () => import('@/views/ArticleDetailView.vue'),

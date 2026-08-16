@@ -44,6 +44,8 @@ public final class Constants {
     public static final String STATUS_ONLINE = "online";
     /** 个人状态-学习中 */
     public static final String STATUS_STUDYING = "studying";
+    /** 个人状态-运动中 */
+    public static final String STATUS_EXERCISING = "exercising";
     /** 个人状态-忙碌 */
     public static final String STATUS_BUSY = "busy";
     /** 个人状态-休息 */

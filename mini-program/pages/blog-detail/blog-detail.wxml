@@ -1,57 +1,52 @@
 <view class="page-shell page-shell--article article-page">
-  <view class="article-nav">
-    <brand-header></brand-header>
-    <view class="article-nav__exit">
-      <reading-exit bind:exit="exitArticle"></reading-exit>
+  <view class="article-nav" style="height:{{navHeight}}px;">
+    <view class="article-nav__exit" style="top:{{menuButtonTop}}px;width:{{menuButtonWidth}}px;height:{{menuButtonHeight}}px;">
+      <reading-exit label="退出" bind:exit="exitArticle"></reading-exit>
     </view>
   </view>
   <skeleton wx:if="{{loading}}" rows="7"></skeleton>
   <error-state wx:elif="{{error}}" title="文章暂时无法打开" detail="{{errorMessage}}" bind:retry="retry"></error-state>
-  <view wx:else>
+  <view wx:else class="article-card">
     <view class="article-hero">
-      <text class="eyebrow">{{article.category === 'life' ? 'LIFE ARTICLE' : 'ARTICLE'}}</text>
       <text class="article-title">{{article.title}}</text>
-      <view class="article-meta">
-        <text class="article-meta__item article-meta__item--date">▦ {{publishedText}}</text>
-        <text class="article-meta__item article-meta__item--time">▣ {{article.readTimeMinutes || 1}} 分钟</text>
-      </view>
+      <text wx:if="{{article.summary}}" class="article-summary">{{article.summary}}</text>
     </view>
-    <view class="divider article-divider"></view>
-    <view class="article-summary" wx:if="{{article.summary}}">
-      <view class="article-summary__label">OPENING NOTE</view>
-      <view class="article-summary__text">{{article.summary}}</view>
+    <view class="article-meta">
+      <text class="article-meta__item">▦ {{publishedText}}</text>
+      <text class="article-meta__item">⊙ {{article.viewCount || 0}} 阅读</text>
+      <text class="article-meta__item">◷ {{article.readTimeMinutes || 1}} 分钟阅读</text>
     </view>
-    <view class="article-outline" wx:if="{{outline.length}}">
-      <view class="article-outline__head">
-        <text class="article-outline__eyebrow">CONTENTS</text>
-        <text class="article-outline__count">{{outline.length}} 个章节</text>
-      </view>
-      <view class="article-outline__item" wx:for="{{outline}}" wx:key="index">
-        <view class="article-outline__marker" aria-hidden="true"></view>
-        <text class="article-outline__title">{{item.title}}</text>
-      </view>
+    <image wx:if="{{coverImageUrl}}" class="article-cover" src="{{coverImageUrl}}" mode="aspectFill"></image>
+    <view wx:if="{{tagList.length}}" class="article-tags">
+      <text wx:for="{{tagList}}" wx:key="*this" class="article-tag">{{item}}</text>
     </view>
-    <rich-text class="article-content" nodes="{{nodes}}" bindtap="handleRichTap"></rich-text>
-    <view wx:if="{{links.length}}" class="article-links paper-card">
-      <view class="paper-card__body"><text class="section-title">文中链接</text><view wx:for="{{links}}" wx:key="url" class="article-link-row"><text class="article-link-row__text">{{item.text}}</text><button class="article-link-row__button pressable" data-index="{{index}}" bindtap="copyLink">复制</button></view></view>
-    </view>
-    <button class="article-copy pressable" bindtap="copyArticleUrl">复制文章标题</button>
-    <view class="article-ending">
-      <view class="article-ending__rule" aria-hidden="true">
-        <view class="article-ending__line"></view>
-        <view class="article-ending__seal"><text>完</text></view>
-        <view class="article-ending__line"></view>
-      </view>
-      <view class="article-ending__card" wx:if="{{tagList.length}}">
-        <view class="article-ending__head">
-          <view>
-            <text class="article-ending__kicker">本篇收录</text>
-            <text class="article-ending__title">文章标签</text>
-          </view>
-          <text class="article-ending__count">{{tagList.length}} 个主题</text>
+    <view class="article-content">
+      <block wx:for="{{blocks}}" wx:key="index" wx:for-item="block">
+        <view wx:if="{{block.type === 'heading2'}}" class="markdown-h2">
+          <view class="markdown-h2__bar"></view>
+          <rich-text class="markdown-h2__text" nodes="{{block.nodes}}" bindtap="handleRichTap"></rich-text>
         </view>
-        <tag-list tags="{{tagList}}" variant="footer"></tag-list>
-      </view>
+        <view wx:elif="{{block.type === 'quote'}}" class="markdown-quote-frame">
+          <view class="markdown-quote-card">
+            <rich-text class="markdown-quote-text" nodes="{{block.nodes}}" bindtap="handleRichTap"></rich-text>
+          </view>
+        </view>
+        <view wx:elif="{{block.type === 'table'}}" class="markdown-table-frame">
+          <view class="markdown-table">
+            <view class="markdown-table__row markdown-table__row--head">
+              <view wx:for="{{block.headers}}" wx:key="index" wx:for-item="cell" class="markdown-table__cell markdown-table__cell--head">
+                <rich-text nodes="{{cell.nodes}}" bindtap="handleRichTap"></rich-text>
+              </view>
+            </view>
+            <view wx:for="{{block.rows}}" wx:key="index" wx:for-item="row" class="markdown-table__row">
+              <view wx:for="{{row.cells}}" wx:key="index" wx:for-item="cell" class="markdown-table__cell">
+                <rich-text nodes="{{cell.nodes}}" bindtap="handleRichTap"></rich-text>
+              </view>
+            </view>
+          </view>
+        </view>
+        <rich-text wx:else class="markdown-rich" nodes="{{block.nodes}}" bindtap="handleRichTap"></rich-text>
+      </block>
     </view>
   </view>
   <view class="safe-bottom"></view>

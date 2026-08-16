@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import MarkdownIt from 'markdown-it'
+import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, FileUp, ImagePlus, LoaderCircle, Save, Send, Upload } from '@lucide/vue'
-import { createArticle, resolveAssetUrl, uploadImage, uploadMarkdown, type ArticlePayload } from '@/api/admin'
+import { createArticle, getAdminArticle, resolveAssetUrl, updateArticle, uploadImage, uploadMarkdown, type ArticlePayload } from '@/api/admin'
+import { renderArticleMarkdown } from '@/lib/articleMarkdown'
 import { useToast } from '@/composables/useToast'
 import { parseImportedArticle } from '@/lib/markdownImport'
 
+const route = useRoute()
 const router = useRouter()
 const { showToast } = useToast()
-const markdown = new MarkdownIt({ html: false, breaks: true, linkify: true })
+const isEditing = computed(() => Boolean(route.params.id))
 
 const title = ref('')
 const summary = ref('')
@@ -18,6 +19,8 @@ const category = ref('tech')
 const tags = ref('')
 const coverImage = ref('')
 const saving = ref(false)
+const loading = ref(false)
+const loadError = ref('')
 const uploadingCover = ref(false)
 const uploadingBodyImage = ref(false)
 const importingMarkdown = ref(false)
@@ -30,7 +33,7 @@ const coverInput = ref<HTMLInputElement | null>(null)
 const editor = ref<HTMLTextAreaElement | null>(null)
 const initialSnapshot = ref('')
 
-const previewHtml = computed(() => markdown.render(content.value || '*在左侧输入 Markdown，右侧会实时预览。*'))
+const previewHtml = computed(() => renderArticleMarkdown(content.value || '*在左侧输入 Markdown，右侧会实时预览。*'))
 const wordCount = computed(() => content.value.replace(/\s/g, '').length)
 const isDirty = computed(() => snapshot() !== initialSnapshot.value)
 
@@ -40,6 +43,29 @@ function snapshot() {
 
 function markClean() {
   initialSnapshot.value = snapshot()
+}
+
+async function loadArticle() {
+  if (!isEditing.value) {
+    markClean()
+    return
+  }
+  loading.value = true
+  loadError.value = ''
+  try {
+    const article = await getAdminArticle(Number(route.params.id))
+    title.value = article.title
+    summary.value = article.summary || ''
+    content.value = article.content || ''
+    category.value = article.category
+    tags.value = article.tags || ''
+    coverImage.value = article.coverImage || ''
+    markClean()
+  } catch (err) {
+    loadError.value = err instanceof Error ? err.message : '文章加载失败'
+  } finally {
+    loading.value = false
+  }
 }
 
 async function handleCoverUpload(event: Event) {
@@ -115,10 +141,14 @@ async function save(status: number) {
     status
   }
   try {
-    await createArticle(payload)
+    if (isEditing.value) {
+      await updateArticle(Number(route.params.id), payload)
+    } else {
+      await createArticle(payload)
+    }
     markClean()
-    showToast(status === 1 ? '文章已发布' : '草稿已保存')
-    await router.push('/articles')
+    showToast(status === 1 ? (isEditing.value ? '文章已更新' : '文章已发布') : '草稿已保存')
+    await router.push(isEditing.value ? `/articles/${route.params.id}` : '/articles')
   } catch (err) {
     showToast(err instanceof Error ? err.message : '文章保存失败', 'error')
   } finally {
@@ -140,9 +170,9 @@ function handleBeforeUnload(event: BeforeUnloadEvent) {
 }
 
 onMounted(() => {
-  markClean()
   window.addEventListener('keydown', handleShortcut)
   window.addEventListener('beforeunload', handleBeforeUnload)
+  void loadArticle()
 })
 
 onUnmounted(() => {
@@ -155,8 +185,8 @@ onUnmounted(() => {
   <div class="max-w-[1400px]">
     <div class="page-header">
       <div>
-        <p class="eyebrow">Compose / Markdown</p>
-        <h2 class="page-title">新建文章</h2>
+        <p class="eyebrow">{{ isEditing ? 'Edit' : 'Compose' }} / Markdown</p>
+        <h2 class="page-title">{{ isEditing ? '编辑文章' : '新建文章' }}</h2>
         <p class="page-description">左侧写作，右侧预览；按 Ctrl/Cmd + S 可保存草稿。</p>
       </div>
       <div class="page-header-actions">
@@ -164,7 +194,10 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <section class="paper-card paper-card--ruled mb-5 p-5">
+    <div v-if="loadError" class="notice error-notice mb-4"><span>{{ loadError }}</span><button class="ghost-button ml-auto min-h-0 px-2 py-1" type="button" @click="loadArticle">重试</button></div>
+    <div v-if="loading" class="paper-card mb-5 space-y-4 p-5"><div v-for="index in 5" :key="index" class="skeleton h-10 rounded-lg" /></div>
+
+    <section v-else-if="!loadError" class="paper-card paper-card--ruled mb-5 p-5">
       <h3 class="form-section-title">文章信息</h3>
       <div class="form-grid form-grid-two">
         <div class="sm:col-span-2">
@@ -202,7 +235,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <section class="split-editor">
+    <section v-if="!loading && !loadError" class="split-editor">
       <div class="editor-pane">
         <div class="editor-pane-header flex items-center justify-between">
           <span>编辑</span>
@@ -219,11 +252,11 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <div class="editor-statusbar">
+    <div v-if="!loading && !loadError" class="editor-statusbar">
       <span class="mono muted-text text-xs">{{ wordCount }} 字 · {{ isDirty ? '有未保存改动' : '未修改' }} · 快捷键 <span class="kbd">Ctrl</span> + <span class="kbd">S</span> 保存草稿</span>
       <div class="flex flex-wrap gap-2">
-        <button class="secondary-button" type="button" :disabled="saving" @click="save(0)"><LoaderCircle v-if="saving" class="h-4 w-4 animate-spin" /><Save v-else class="h-4 w-4" />保存草稿</button>
-        <button class="primary-button" type="button" :disabled="saving" @click="save(1)"><LoaderCircle v-if="saving" class="h-4 w-4 animate-spin" /><Send v-else class="h-4 w-4" />直接发布</button>
+        <button class="secondary-button" type="button" :disabled="saving" @click="save(0)"><LoaderCircle v-if="saving" class="h-4 w-4 animate-spin" /><Save v-else class="h-4 w-4" />{{ isEditing ? '保存为草稿' : '保存草稿' }}</button>
+        <button class="primary-button" type="button" :disabled="saving" @click="save(1)"><LoaderCircle v-if="saving" class="h-4 w-4 animate-spin" /><Send v-else class="h-4 w-4" />{{ isEditing ? '保存并发布' : '直接发布' }}</button>
       </div>
     </div>
   </div>

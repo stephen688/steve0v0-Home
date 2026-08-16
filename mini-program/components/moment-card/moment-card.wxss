@@ -47,6 +47,36 @@
   white-space: pre-wrap;
 }
 
+.moment-card__location {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 16rpx;
+  color: #8b7666;
+  font-size: 23rpx;
+  line-height: 1.45;
+}
+
+.moment-card__location-pin {
+  position: relative;
+  width: 20rpx;
+  height: 20rpx;
+  flex: 0 0 20rpx;
+  border: 2rpx solid #c87945;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+}
+
+.moment-card__location-pin-dot {
+  position: absolute;
+  top: 5rpx;
+  left: 5rpx;
+  width: 6rpx;
+  height: 6rpx;
+  border-radius: 50%;
+  background: #c87945;
+}
+
 .moment-card__images {
   display: grid;
   gap: 8rpx;
@@ -57,15 +87,18 @@
 
 .moment-card__images--single {
   grid-template-columns: 1fr;
+  width: 520rpx;
+  max-width: 100%;
 }
 
-.moment-card__images--double,
+.moment-card__images--nine,
 .moment-card__images--grid {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.moment-card__images--double .moment-card__image:first-child {
-  grid-column: span 2;
+.moment-card__images--double,
+.moment-card__images--quad {
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .moment-card__image {
@@ -76,7 +109,12 @@
 }
 
 .moment-card__images--single .moment-card__image {
-  height: 360rpx;
+  height: 390rpx;
+}
+
+.moment-card__images--double .moment-card__image,
+.moment-card__images--quad .moment-card__image {
+  height: 300rpx;
 }
 
 .moment-card__media {

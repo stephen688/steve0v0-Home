@@ -1,8 +1,36 @@
 import { api } from '../../services/api';
 import { ArticleDetail } from '../../types/api';
-import { markdownToNodes, RichNode } from '../../utils/markdown';
-import { copyText } from '../../utils/clipboard';
-import { formatDate, parseTags } from '../../utils/format';
+import { markdownToNodes, MarkdownBlock, RichNode } from '../../utils/markdown';
+import { formatDateTime, parseTags } from '../../utils/format';
+
+function resolveAssetUrl(value: string): string {
+  const url = String(value || '').trim();
+  if (!url || /^https?:\/\//i.test(url)) return url;
+  const app = getApp<any>();
+  const base = String(app?.globalData?.apiBase || '').replace(/\/$/, '');
+  return `${base}${url.startsWith('/') ? url : `/${url}`}`;
+}
+
+function getNavigationMetrics() {
+  try {
+    const menuButton = wx.getMenuButtonBoundingClientRect();
+    return {
+      navHeight: Math.ceil(menuButton.bottom + 8),
+      menuButtonTop: menuButton.top,
+      menuButtonHeight: menuButton.height,
+      menuButtonWidth: menuButton.width
+    };
+  } catch (_) {
+    const system = wx.getSystemInfoSync();
+    const statusBarHeight = system.statusBarHeight || 24;
+    return {
+      navHeight: statusBarHeight + 44,
+      menuButtonTop: statusBarHeight + 4,
+      menuButtonHeight: 32,
+      menuButtonWidth: 87
+    };
+  }
+}
 
 Page({
   data: {
@@ -10,10 +38,14 @@ Page({
     article: null as ArticleDetail | null,
     tagList: [] as string[],
     publishedText: '',
+    coverImageUrl: '',
     nodes: [] as RichNode[],
-    outline: [] as { index: string; title: string }[],
+    blocks: [] as MarkdownBlock[],
     imageUrls: [] as string[],
-    links: [] as { text: string; url: string }[],
+    navHeight: 76,
+    menuButtonTop: 28,
+    menuButtonHeight: 32,
+    menuButtonWidth: 87,
     loading: true,
     error: false,
     errorMessage: '请稍后重试'
@@ -21,7 +53,7 @@ Page({
 
   onLoad(options: { id?: string }) {
     const id = Number(options?.id || 0);
-    this.setData({ id });
+    this.setData({ id, ...getNavigationMetrics() });
     if (!id) {
       this.setData({ loading: false, error: true, errorMessage: '文章编号无效' });
       return;
@@ -33,7 +65,16 @@ Page({
     this.setData({ loading: true, error: false });
     api.getArticle(this.data.id).then((article) => {
       const rendered = markdownToNodes(article.content || '');
-      this.setData({ article, tagList: parseTags(article.tags), publishedText: formatDate(article.publishedAt || article.createdAt, 'YYYY-MM-DD'), nodes: rendered.nodes, outline: rendered.outline, imageUrls: rendered.imageUrls, links: rendered.links, loading: false });
+      this.setData({
+        article,
+        tagList: parseTags(article.tags),
+        publishedText: formatDateTime(article.publishedAt || article.createdAt),
+        coverImageUrl: resolveAssetUrl(article.coverImage),
+        nodes: rendered.nodes,
+        blocks: rendered.blocks,
+        imageUrls: rendered.imageUrls,
+        loading: false
+      });
     }).catch((error: Error) => {
       this.setData({ loading: false, error: true, errorMessage: error.message || '文章暂时无法加载' });
     });
@@ -50,17 +91,6 @@ Page({
   handleRichTap(event: WechatPageEvent) {
     const src = event.detail?.src || event.detail?.currentTarget?.dataset?.src;
     if (src && this.data.imageUrls.includes(src)) wx.previewImage({ current: src, urls: this.data.imageUrls });
-  },
-
-  copyLink(event: WechatPageEvent) {
-    const index = Number(event.currentTarget?.dataset?.index || 0);
-    const link = this.data.links[index];
-    if (link) copyText(link.url, '链接已复制');
-  },
-
-  copyArticleUrl() {
-    const article = this.data.article;
-    if (article) copyText(`文章：${article.title}`, '文章标题已复制');
   },
 
   exitArticle() {

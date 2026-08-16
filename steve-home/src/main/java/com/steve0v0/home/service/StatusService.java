@@ -28,6 +28,7 @@ public class StatusService {
     private static final Set<String> VALID_STATES = Set.of(
             Constants.STATUS_ONLINE,
             Constants.STATUS_STUDYING,
+            Constants.STATUS_EXERCISING,
             Constants.STATUS_BUSY,
             Constants.STATUS_REST
     );
@@ -58,7 +59,7 @@ public class StatusService {
     public void updateStatus(StatusUpdateDTO dto) {
         if (dto.getState() != null && !VALID_STATES.contains(dto.getState())) {
             throw new BusinessException(ResultCode.BAD_REQUEST,
-                    "状态值无效，仅支持：online / studying / busy / rest");
+                    "状态值无效，仅支持：online / studying / exercising / busy / rest");
         }
 
         Status existing = statusMapper.selectById(Constants.STATUS_RECORD_ID);

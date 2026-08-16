@@ -2,12 +2,11 @@
   <brand-header></brand-header>
 
   <view class="home-greeting">
-    <view>
+    <view class="home-greeting__copy">
       <text class="eyebrow">STEVE0V0 / HOME</text>
       <text class="home-greeting__title">今天，也向前一点。</text>
     </view>
     <view class="home-greeting__tools">
-      <text class="home-greeting__date">{{selectedDate}}</text>
       <button class="tomato-launcher {{pomodoro.running ? 'tomato-launcher--running' : ''}} {{pomodoro.completed ? 'tomato-launcher--completed' : ''}} pressable" bindtap="openPomodoro" aria-label="打开番茄钟">
         <view class="tomato-launcher__plate">
           <view class="tomato-mini" aria-hidden="true">
@@ -21,32 +20,7 @@
         <text class="tomato-launcher__label">番茄钟</text>
       </button>
     </view>
-  </view>
-
-  <view class="paper-card section-gap home-status-card {{status && status.state === 'studying' ? 'home-status-card--studying' : ''}}">
-    <view class="paper-card__body home-status">
-      <view class="home-status__line">
-        <view class="home-status__identity">
-          <text class="home-status__dot"></text>
-          <text class="section-title">当前状态</text>
-        </view>
-        <text wx:if="{{status}}" class="pill pill--green">{{status.stateLabel}}</text>
-      </view>
-      <skeleton wx:if="{{statusLoading}}" rows="1"></skeleton>
-      <error-state wx:elif="{{statusError}}" bind:retry="retryStatus"></error-state>
-      <view wx:else class="home-status__layout">
-        <view class="home-status__content">
-          <text wx:if="{{status && status.state === 'studying'}}" class="home-status__kicker">FOCUS SESSION</text>
-          <text class="home-status__task">{{status.currentTask || '今天还没有记录正在做的事'}}</text>
-          <text class="home-status__mood">{{status.mood || '给自己留一点空间，慢慢来。'}}</text>
-        </view>
-        <view wx:if="{{status && status.state === 'studying'}}" class="home-status__visual" aria-hidden="true">
-          <view class="home-status__halo"></view>
-          <image class="home-status__student" src="/assets/status/studying-student.webp" mode="aspectFit"></image>
-          <view class="home-status__ink-stroke"></view>
-        </view>
-      </view>
-    </view>
+    <text class="home-greeting__date">{{selectedDate}}</text>
   </view>
 
   <view class="paper-card section-gap calendar-card">
@@ -145,6 +119,34 @@
   <view class="safe-bottom"></view>
 </view>
 
+<movable-area wx:if="{{statusPetReady && status && (status.state === 'studying' || status.state === 'exercising')}}" class="status-pet-area">
+  <movable-view
+    class="status-pet status-pet--{{status.state}}"
+    direction="all"
+    x="{{statusPetX}}"
+    y="{{statusPetY}}"
+    damping="36"
+    friction="3"
+    inertia="{{false}}"
+    out-of-bounds="{{false}}"
+    bindchange="onStatusPetMove"
+    bindtouchend="saveStatusPetPosition"
+    aria-role="button"
+    aria-label="{{status.state === 'exercising' ? '运动' : '学习'}}伴随角色，可拖动。当前活动：{{status.currentTask || (status.state === 'exercising' ? '正在打球' : '正在学习')}}"
+  >
+    <view class="status-pet__figure" aria-hidden="true">
+      <view class="status-pet__halo"></view>
+      <image class="status-pet__student" src="{{status.state === 'exercising' ? '/assets/status/basketball-student.webp' : '/assets/status/studying-student.webp'}}" mode="aspectFit"></image>
+      <view wx:if="{{status.state === 'studying'}}" class="status-pet__typing"><text></text><text></text><text></text></view>
+      <view wx:else class="status-pet__motion"><text></text><text></text></view>
+    </view>
+    <view class="status-pet__status">
+      <view class="status-pet__state"><text class="status-pet__dot"></text><text>{{status.state === 'exercising' ? '运动中' : '学习中'}}</text></view>
+      <text class="status-pet__task">{{status.currentTask || (status.state === 'exercising' ? '正在打篮球' : '正在专注学习')}}</text>
+    </view>
+  </movable-view>
+</movable-area>
+
 <view wx:if="{{pomodoroOpen}}" class="pomodoro-modal__mask" catchtap="closePomodoro" catchtouchmove="noop">
   <view class="pomodoro-modal pomodoro-modal--{{pomodoro.mode}}" catchtap="noop" aria-role="dialog" aria-label="番茄专注计时器">
     <view class="pomodoro-modal__handle"></view>
@@ -153,7 +155,7 @@
         <text class="eyebrow">POMODORO TIMER</text>
         <text class="pomodoro-modal__title">一颗会提醒休息的小番茄</text>
       </view>
-      <button class="pomodoro-modal__close pressable" bindtap="closePomodoro" aria-label="关闭番茄钟">×</button>
+      <button class="pomodoro-modal__close pressable" bindtap="closePomodoro" aria-label="关闭番茄钟"><text>×</text></button>
     </view>
 
     <view class="pomodoro-modes" aria-label="计时阶段">
@@ -169,7 +171,7 @@
     </view>
 
     <view class="pomodoro-dial-wrap">
-      <view class="pomodoro-dial {{pomodoro.running ? 'pomodoro-dial--running' : ''}}">
+      <view class="pomodoro-dial {{pomodoro.running ? 'pomodoro-dial--running' : ''}} pressable" bindtap="togglePomodoro" aria-role="button" aria-label="{{pomodoro.running ? '暂停番茄钟' : '开始番茄钟'}}">
         <view class="pomodoro-dial__leaves" aria-hidden="true">
           <view class="pomodoro-dial__stem"></view>
           <view class="pomodoro-dial__leaf pomodoro-dial__leaf--one"></view>
@@ -183,6 +185,7 @@
           <text class="pomodoro-dial__phase">{{pomodoroModeLabel}} · {{pomodoroStatusLabel}}</text>
           <text class="pomodoro-dial__time">{{pomodoroDisplay}}</text>
           <text class="pomodoro-dial__task">{{pomodoro.task || '先写下这一轮要完成的事'}}</text>
+          <text class="pomodoro-dial__tap-hint">{{pomodoro.running ? '轻触暂停' : (pomodoro.completed ? '轻触进入下一阶段' : '轻触开始')}}</text>
         </view>
       </view>
     </view>
@@ -195,31 +198,36 @@
     </view>
 
     <view class="pomodoro-actions">
-      <button class="pomodoro-actions__round pressable" bindtap="resetPomodoro" aria-label="重置当前阶段">↺</button>
+      <button class="pomodoro-actions__round pressable" bindtap="resetPomodoro">重置</button>
       <button class="pomodoro-actions__primary pressable" bindtap="togglePomodoro">{{pomodoroPrimaryLabel}}</button>
-      <button class="pomodoro-actions__round pressable" bindtap="skipPomodoroPhase" aria-label="跳过当前阶段">→</button>
+      <button class="pomodoro-actions__round pressable" bindtap="skipPomodoroPhase">跳过</button>
     </view>
 
     <view class="pomodoro-settings">
       <view class="pomodoro-settings__head">
-        <text class="pomodoro-settings__title">本轮设置</text>
-        <button class="pomodoro-settings__save pressable" bindtap="applyPomodoroInputs">保存设置</button>
+        <view><text class="pomodoro-settings__title">本轮设置</text><text class="pomodoro-settings__summary">设置只影响当前专注循环</text></view>
+        <button class="pomodoro-settings__save pressable" bindtap="savePomodoroSettings" disabled="{{pomodoro.running}}">应用设置</button>
       </view>
       <view class="pomodoro-settings__task-row">
-        <text class="pomodoro-settings__label">专注任务</text>
-        <input class="pomodoro-settings__task" maxlength="40" value="{{pomodoroTaskInput}}" bindinput="onPomodoroTaskInput" disabled="{{pomodoro.running}}" placeholder="这一轮准备完成什么？" />
+        <view class="pomodoro-settings__field-head"><text class="pomodoro-settings__label">专注任务</text><text class="pomodoro-settings__note">最多 40 字</text></view>
+        <input class="pomodoro-settings__task" maxlength="40" value="{{pomodoroTaskInput}}" bindinput="onPomodoroTaskInput" disabled="{{pomodoro.running}}" cursor-spacing="24" placeholder="这一轮只完成哪一件事？" />
       </view>
       <view class="pomodoro-settings__duration-row">
-        <view><text class="pomodoro-settings__label">专注时长</text><text class="pomodoro-settings__note">休息阶段会自动衔接</text></view>
+        <view class="pomodoro-settings__field-head"><text class="pomodoro-settings__label">专注时长</text><text class="pomodoro-settings__note">每次调整 5 分钟</text></view>
         <view class="pomodoro-stepper">
-          <button class="pomodoro-stepper__button pressable" data-delta="-5" bindtap="adjustPomodoroDuration" aria-label="减少五分钟">−</button>
+          <button class="pomodoro-stepper__button pressable" data-delta="-5" bindtap="adjustPomodoroDuration" disabled="{{pomodoro.running}}" aria-label="减少五分钟">−</button>
           <input class="pomodoro-stepper__input" type="number" maxlength="3" value="{{pomodoroDurationInput}}" bindinput="onPomodoroDurationInput" bindblur="applyPomodoroInputs" disabled="{{pomodoro.running}}" />
           <text class="pomodoro-stepper__unit">分</text>
-          <button class="pomodoro-stepper__button pressable" data-delta="5" bindtap="adjustPomodoroDuration" aria-label="增加五分钟">＋</button>
+          <button class="pomodoro-stepper__button pressable" data-delta="5" bindtap="adjustPomodoroDuration" disabled="{{pomodoro.running}}" aria-label="增加五分钟">＋</button>
         </view>
       </view>
+      <view class="pomodoro-presets" aria-label="快捷专注时长">
+        <button wx:for="{{pomodoroDurationPresets}}" wx:key="value" class="pomodoro-presets__item {{pomodoroDurationInput === item.value ? 'pomodoro-presets__item--active' : ''}} pressable" data-duration="{{item.value}}" bindtap="setPomodoroDurationPreset" disabled="{{pomodoro.running}}">
+          <text class="pomodoro-presets__value">{{item.value}} 分</text><text class="pomodoro-presets__label">{{item.label}}</text>
+        </button>
+      </view>
     </view>
-    <text class="pomodoro-modal__hint">计时保存在本机；关闭弹窗后，小番茄仍会继续工作。</text>
+    <text class="pomodoro-modal__hint">计时保存在本机，收起页面后仍会继续。</text>
   </view>
 </view>
 

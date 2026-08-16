@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Status {
     /** 固定为 1 */
     private Long id;
-    /** 状态：online/studying/busy/rest */
+    /** 状态：online/studying/exercising/busy/rest */
     private String state;
     private String currentTask;
     private String mood;

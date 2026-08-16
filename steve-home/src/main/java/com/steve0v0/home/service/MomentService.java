@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,6 +46,7 @@ public class MomentService {
         vo.setContent(moment.getContent());
         vo.setMediaType(moment.getMediaType());
         vo.setMediaUrl(moment.getMediaUrl());
+        vo.setLocation(moment.getLocation());
         vo.setCreatedAt(moment.getCreatedAt());
         // 从批量查询的图片 Map 中取出该动态的图片
         List<MomentImage> images = imageMap.getOrDefault(moment.getId(), Collections.emptyList());
@@ -115,14 +117,23 @@ public class MomentService {
      */
     @Transactional
     public Long createMoment(MomentCreateDTO dto) {
+        if (!StringUtils.hasText(dto.getContent())
+                && !StringUtils.hasText(dto.getLocation())
+                && CollectionUtils.isEmpty(dto.getImages())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "动态内容、地点和图片不能同时为空");
+        }
         Moment moment = new Moment();
-        moment.setContent(dto.getContent());
+        moment.setContent(StringUtils.hasText(dto.getContent()) ? dto.getContent().trim() : "");
+        moment.setLocation(StringUtils.hasText(dto.getLocation()) ? dto.getLocation().trim() : null);
         // mediaType 默认 text，第一阶段仅允许 text 和 image
         String mediaType = dto.getMediaType() != null ? dto.getMediaType() : Constants.MEDIA_TYPE_TEXT;
         if (!Constants.MEDIA_TYPE_TEXT.equals(mediaType) && !Constants.MEDIA_TYPE_IMAGE.equals(mediaType)) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "第一阶段仅支持 text 和 image 类型");
         }
         moment.setMediaType(mediaType);
+        if (dto.getCreatedAt() != null) {
+            moment.setCreatedAt(dto.getCreatedAt());
+        }
 
         momentMapper.insert(moment);
 

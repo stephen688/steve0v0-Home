@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import MarkdownIt from 'markdown-it'
-import { ArrowLeft, CalendarDays, Clock3, Eye, RefreshCw, Trash2 } from '@lucide/vue'
+import { ArrowLeft, CalendarDays, Clock3, Eye, Pencil, RefreshCw, Trash2 } from '@lucide/vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { deleteArticle, getAdminArticle, resolveAssetUrl, type ArticleDetail } from '@/api/admin'
+import { renderArticleMarkdown } from '@/lib/articleMarkdown'
 import { categoryLabel, formatDateTime, parseTags } from '@/lib/format'
 import { useToast } from '@/composables/useToast'
 
 const route = useRoute()
 const router = useRouter()
 const { showToast } = useToast()
-const markdown = new MarkdownIt({ html: false, breaks: true, linkify: true })
 
 const loading = ref(true)
 const deleting = ref(false)
@@ -60,6 +59,7 @@ onMounted(loadArticle)
       </div>
       <div class="page-header-actions">
         <router-link class="ghost-button no-underline" to="/articles"><ArrowLeft class="h-4 w-4" />返回列表</router-link>
+        <router-link v-if="article" class="secondary-button no-underline" :to="`/articles/${article.id}/edit`"><Pencil class="h-4 w-4" />编辑</router-link>
         <button v-if="article" class="danger-button" type="button" @click="showDelete = true"><Trash2 class="h-4 w-4" />删除</button>
       </div>
     </div>
@@ -84,7 +84,7 @@ onMounted(loadArticle)
       </div>
       <img v-if="article.coverImage" class="mt-6 max-h-[360px] w-full rounded-xl object-cover" :src="resolveAssetUrl(article.coverImage)" alt="文章封面" />
       <div v-if="parseTags(article.tags).length" class="tag-list mb-7"><span v-for="tag in parseTags(article.tags)" :key="tag" class="tag-chip">{{ tag }}</span></div>
-      <div class="article-body" v-html="markdown.render(article.content || '暂无正文。')" />
+      <div class="article-body" v-html="renderArticleMarkdown(article.content || '暂无正文。')" />
     </article>
 
     <ConfirmDialog

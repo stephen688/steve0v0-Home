@@ -156,6 +156,7 @@
   min-height: 76rpx;
   align-items: center;
   justify-content: center;
+  margin: 0;
   padding: 0 22rpx;
   border: 2rpx solid #eadfd4;
   border-radius: 40rpx;
@@ -163,6 +164,15 @@
   color: #64574f;
   font-size: 24rpx;
   font-weight: 600;
+  line-height: 1;
+}
+
+.moments-sort__trigger::after {
+  border: 0;
+}
+
+.moments-sort__trigger[disabled] {
+  opacity: .56;
 }
 
 .moments-sort__arrow {

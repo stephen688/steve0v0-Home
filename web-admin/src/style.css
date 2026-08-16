@@ -1148,7 +1148,15 @@ article a:hover {
 
 .article-body { color: hsl(var(--foreground)); font-size: 1rem; line-height: 1.9; }
 .article-body h1, .article-body h2, .article-body h3 { margin: 1.7em 0 0.7em; line-height: 1.35; }
-.article-body h2 { padding-left: 12px; border-left: 3px solid hsl(var(--primary)); font-size: 1.35rem; }
+.article-body h2 {
+  padding-left: 10px;
+  border-left: 3px solid #ff8a00;
+  color: #1f1f1f;
+  font-family: var(--font-family-sans);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
 .article-body h3 { font-size: 1.12rem; }
 .article-body p { margin: 0 0 1em; }
 .article-body ul, .article-body ol { margin: 0 0 1.25em; padding-left: 1.5em; }
@@ -1497,6 +1505,7 @@ article a:hover {
 }
 
 .status-strip.state-studying::before { background: linear-gradient(180deg, hsl(var(--accent)), hsl(var(--accent) / 0.4)); }
+.status-strip.state-exercising::before { background: hsl(var(--warning)); }
 .status-strip.state-busy::before { background: linear-gradient(180deg, hsl(var(--warning)), hsl(var(--warning) / 0.4)); }
 .status-strip.state-rest::before { background: linear-gradient(180deg, hsl(var(--info)), hsl(var(--info) / 0.4)); }
 

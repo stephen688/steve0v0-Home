@@ -4,9 +4,13 @@
     <text>{{item.createdText}}</text>
     <text class="pill pill--blue moment-card__tag">{{item.mediaTypeLabel}}</text>
   </view>
-  <text class="moment-card__content">{{item.content}}</text>
+  <text wx:if="{{item.content}}" class="moment-card__content">{{item.content}}</text>
   <view wx:if="{{item.images.length}}" class="moment-card__images moment-card__images--{{item.imageLayout}}">
     <image wx:for="{{item.images}}" wx:key="*this" class="moment-card__image" src="{{item}}" mode="aspectFill" data-current="{{item}}" bindtap="preview"></image>
+  </view>
+  <view wx:if="{{item.location}}" class="moment-card__location">
+    <view class="moment-card__location-pin"><view class="moment-card__location-pin-dot"></view></view>
+    <text>{{item.location}}</text>
   </view>
   <view wx:if="{{item.mediaUrl}}" class="moment-card__media">媒体内容：{{item.mediaUrl}}</view>
 </view>

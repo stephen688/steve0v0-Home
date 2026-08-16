@@ -3,6 +3,7 @@ package com.steve0v0.home.controller;
 import com.steve0v0.home.common.result.Result;
 import com.steve0v0.home.dto.ArticleCreateDTO;
 import com.steve0v0.home.dto.ArticleQueryDTO;
+import com.steve0v0.home.dto.ArticleUpdateDTO;
 import com.steve0v0.home.common.pagination.PageResult;
 import com.steve0v0.home.service.ArticleService;
 import com.steve0v0.home.vo.ArticleDetailVO;
@@ -47,6 +48,16 @@ public class AdminArticleController {
     @PostMapping
     public Result<Long> create(@Valid @RequestBody ArticleCreateDTO dto) {
         return Result.success(articleService.createArticle(dto));
+    }
+
+    /**
+     * 修改文章
+     * 支持修改已发布文章或在草稿与发布状态之间切换
+     */
+    @PutMapping("/{id}")
+    public Result<Void> update(@PathVariable Long id, @Valid @RequestBody ArticleUpdateDTO dto) {
+        articleService.updateArticle(id, dto);
+        return Result.success();
     }
 
     /**

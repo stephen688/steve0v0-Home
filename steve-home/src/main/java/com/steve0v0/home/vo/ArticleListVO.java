@@ -16,6 +16,7 @@ public class ArticleListVO {
     private String coverImage;
     private String category;
     private String tags;
+    private Integer status;
     private Integer viewCount;
     private LocalDateTime publishedAt;
 

@@ -15,6 +15,7 @@ export interface ArticleList {
   coverImage: string | null
   category: string
   tags: string | null
+  status: number
   viewCount: number
   publishedAt: string | null
   readTimeMinutes: number
@@ -22,7 +23,6 @@ export interface ArticleList {
 
 export interface ArticleDetail extends ArticleList {
   content: string | null
-  status: number
   createdAt: string
   updatedAt: string
 }
@@ -42,6 +42,7 @@ export interface MomentItem {
   content: string
   mediaType: string
   mediaUrl: string | null
+  location: string | null
   createdAt: string
   images: string[]
 }
@@ -50,6 +51,8 @@ export interface MomentPayload {
   content: string
   mediaType: 'text' | 'image'
   images: string[]
+  location?: string
+  createdAt?: string
 }
 
 export interface StudyRecordList {
@@ -154,6 +157,10 @@ export function getAdminArticle(id: number) {
 
 export function createArticle(payload: ArticlePayload) {
   return client.post<ApiResult<number>>('/admin/articles', payload).then(unwrap)
+}
+
+export function updateArticle(id: number, payload: ArticlePayload) {
+  return client.put<ApiResult<null>>(`/admin/articles/${id}`, payload).then(unwrap)
 }
 
 export function deleteArticle(id: number) {

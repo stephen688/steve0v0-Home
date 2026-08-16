@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 public class StatusUpdateDTO {
-    /** 状态：online/studying/busy/rest */
+    /** 状态：online/studying/exercising/busy/rest */
     @Size(max = 20, message = "状态最长20个字符")
     private String state;
 
